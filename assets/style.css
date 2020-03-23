@@ -1,0 +1,487 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.control-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    width: 100%;
+    background-color: #000;
+}
+
+.wrapper {
+    display: flex;
+    position: relative;
+    height: calc(100% - 50px);
+    overflow: hidden;
+    flex-direction: row-reverse;
+}
+
+.sidebar {
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    user-select: none;
+}
+
+.sidebar.mode-list,
+.sidebar.mode-map {
+    width: 480px;
+    bottom: 0;
+}
+
+.sidebar.mode-card {
+    width: 480px;
+    max-height: 100%;
+}
+
+.region-list {
+    height: 100%;
+    overflow: hidden;
+    display: none;
+}
+
+.sidebar.mode-list .region-list,
+.sidebar.mode-map .region-list {
+    display: block;
+}
+
+.map-container {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.scope,
+.map {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.map {
+    background-color: #191b1b;
+}
+
+.scope {
+    pointer-events: none;
+}
+
+.play-button {
+    width: 35px;
+    height: 35px;
+    margin: 5px 5px 5px 10px;
+    cursor: pointer;
+    color: #fff;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    flex-shrink: 0;
+    border: 2px solid #eee;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.icon.play {
+    width: 35px;
+    height: 35px;
+    margin-top: -3px;
+    margin-left: -6px;
+}
+
+.icon.pause {
+    width: 35px;
+    height: 35px;
+    margin-top: -3px;
+    margin-left: -8px;
+}
+
+.icon.hidden {
+    display: none;
+}
+
+.date-slider {
+    flex-grow: 1;
+    margin: 5px 10px 5px 5px;
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    background-color: #eee;
+    outline: none;
+}
+
+.date-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #eee;
+    cursor: pointer;
+}
+
+.date-slider::-moz-range-thumb {
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    outline: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #eee;
+    cursor: pointer;
+}
+
+.date-slider.hidden {
+    visibility: hidden;
+}
+
+.date-indicator {
+    margin: 5px;
+    color: #eee;
+    font-size: 16px;
+    user-select: none;
+}
+
+.countries {
+    width: 100%;
+    height: calc(100% - 50px);
+    background-color: #fff;
+    overflow: auto;
+}
+
+/* Custom scrollbar styles (Webkit) */
+.countries::-webkit-scrollbar,
+.card::-webkit-scrollbar {
+    width: 5px;
+}
+.countries::-webkit-scrollbar-track,
+.card::-webkit-scrollbar-track {
+    background: transparent;
+}
+.countries::-webkit-scrollbar-thumb,
+.card::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: #777;
+}
+
+/* Custom scrollbar styles (Firefox) */
+.countries,
+.card {
+    scrollbar-width: thin;
+    scrollbar-color: #777 transparent;
+}
+
+.country {
+    position: relative;
+    font-size: 20px;
+}
+
+.country:not(:last-child) {
+    border-bottom: 1px solid #ddd;
+}
+
+.country-info {
+    cursor: pointer;
+    padding: 5px 15px 5px 0;
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+.countries.row-cases .country-case-count,
+.countries.row-cases .region-case-count {
+    color: #053061;
+}
+.countries.row-deaths .country-case-count,
+.countries.row-deaths .region-case-count {
+    color: #ca0020;
+}
+
+.country-info[data-id='world'] .country-name,
+.country-info[data-id='world'] .country-case-count {
+    font-weight: bold;
+}
+
+.country-name {
+    flex-grow: 1;
+}
+
+.expand-button {
+    width: 32px;
+    height: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-top: 10px;
+    color: #111;
+}
+
+.expand-button.hidden {
+    visibility: hidden;
+}
+
+.icon.expand-hover {
+    display: none;
+}
+.expand-button:hover .icon.expand {
+    display: none;
+}
+.expand-button:hover .icon.expand-hover {
+    display: inline;
+}
+
+.icon.expand,
+.icon.expand-hover {
+    pointer-events: none;
+    width: 10px;
+    height: 10px;
+    margin-left: 10px;
+    transform: rotate(180deg);
+    transition: transform 0.4s;
+}
+
+.country.expanded .icon.expand,
+.country.expanded .icon.expand-hover {
+    transform: rotate(0);
+}
+
+.country-info:hover {
+    background-color: #efefef;
+}
+
+.country-regions {
+    display: none;
+}
+
+.country.expanded .country-regions {
+    display: block;
+}
+
+.region {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    border: 1px solid #ddd;
+    padding: 5px 15px;
+    margin: 5px 10px 5px 35px;
+    border-radius: 5px;
+}
+
+.region:hover {
+    background-color: #efefef;
+}
+
+.row-selector {
+    display: flex;
+    width: 100%;
+    height: 50px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.row-selector-button {
+    box-sizing: border-box;
+    flex-grow: 1;
+    font-weight: bold;
+    height: 50px;
+    line-height: 50px;
+    cursor: pointer;
+    text-align: center;
+    background-color: #eeeeee;
+}
+
+.row-selector-button[data-row='cases'] {
+    color: #053061;
+}
+.row-selector-button[data-row='deaths'] {
+    color: #b2182b;
+}
+
+.row-selector-button:not(:first-child) {
+    margin-left: -1px;
+}
+
+.row-selector-button.active {
+    background-color: #fff;
+    cursor: initial;
+}
+
+.card {
+    display: none;
+    position: relative;
+    padding: 15px;
+    padding-right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    border-bottom-right-radius: 5px;
+    overflow: auto;
+}
+
+.sidebar.mode-card .card {
+    display: block;
+}
+
+.close-button {
+    position: absolute;
+    right: 14px;
+    top: 12px;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.icon.close {
+    width: 100%;
+    height: 100%;
+}
+
+.card-header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-subheader {
+    font-size: 20px;
+    color: #888;
+    font-weight: bold;
+}
+
+.chart {
+    margin-top: 20px;
+}
+
+.chart-counters {
+    display: flex;
+    margin: 20px 35px 0 15px;
+}
+
+.chart-counter {
+    width: 50%;
+}
+
+.chart-counter.cases {
+    color: #2166ac;
+}
+.chart-counter.deaths {
+    color: #b2182b;
+}
+
+.chart-counter-caption {
+    font-size: 24px;
+}
+.chart-counter-number {
+    margin-top: -5px;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.mode-selector {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .sidebar,
+    .mode-selector {
+        z-index: 3;
+    }
+
+    .map-container {
+        height: calc(100% - 40px);
+    }
+
+    .sidebar.sidebar.mode-list,
+    .sidebar.sidebar.mode-card {
+        width: 100%;
+        height: calc(100% - 40px);
+    }
+
+    .sidebar.mode-map {
+        display: none;
+    }
+
+    .card {
+        border-radius: 0;
+    }
+
+    .close-button {
+        display: none;
+    }
+
+    .mode-selector {
+        user-select: none;
+        display: flex;
+        height: 40px;
+        background-color: #fff;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #ddd;
+    }
+
+    .mode-selector-button {
+        display: flex;
+        justify-content: center;
+        box-sizing: border-box;
+        flex-grow: 1;
+        line-height: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        text-align: center;
+        background-color: #efefef;
+        vertical-align: middle;
+    }
+
+    .mode-selector-button:not(:last-child) {
+        border-right: 1px solid #ddd;
+    }
+
+    .mode-selector-button.active {
+        background-color: #fff;
+        cursor: initial;
+    }
+
+    .icon-map {
+        height: 14px;
+        margin-top: 12px;
+        margin-right: 5px;
+    }
+
+    .icon-table {
+        height: 16px;
+        margin-top: 11px;
+        margin-right: 5px;
+    }
+
+    .icon-chart {
+        height: 16px;
+        margin-top: 12px;
+        margin-right: 5px;
+    }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "corona",
+  "version": "1.0.0",
+  "description": "Mapcreator test assignment",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "npm run clean && webpack --env.production && npm run minify",
+    "lint": "tslint -p tsconfig.json 'src/**/*.ts'",
+    "prettier": "prettier --check \"./src/**/*.ts\"",
+    "clean": "rm -rf dist",
+    "minify": "npm run minify:html && npm run minify:css",
+    "minify:html": "html-minifier -c html-minifier.json -o dist/index.html dist/index.html",
+    "minify:css": "csso dist/style.css --output dist/style.css",
+    "update": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/update"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/csv-parse": "^1.2.2",
+    "@types/mapbox-gl": "^1.8.0",
+    "@types/node-fetch": "^2.5.5",
+    "copy-webpack-plugin": "^5.1.1",
+    "csso-cli": "^3.0.0",
+    "fork-ts-checker-webpack-plugin": "^3.1.1",
+    "html-minifier": "^4.0.0",
+    "node-fetch": "^2.6.0",
+    "prettier": "^1.19.1",
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.6.2",
+    "tslint": "^5.20.1",
+    "tslint-config-airbnb": "^5.11.2",
+    "typescript": "^3.7.3",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
+    "webpack-glsl-loader": "^1.0.1"
+  },
+  "dependencies": {
+    "csv": "^5.3.2",
+    "date-and-time": "^0.13.1",
+    "mapbox-gl": "^1.8.1"
+  }
+}

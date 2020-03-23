@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, height=device-height, initial-scale=1, user-scalable=no"
+        />
+
+        <link rel="shortcut icon" href="favicon.png" />
+
+        <title>COVID-19 Tracker</title>
+        <meta name="description" content="Animated COVID-19 visualization using WebGL and Mapbox GL JS API. Based on on data from the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University."></meta>
+
+        <meta name="title" content="COVID-19 Tracker" />
+        <meta name="description" content="Animated COVID-19 visualization using WebGL and Mapbox GL JS API. Based on on data from the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University." />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://alex.gl/corona/" />
+        <meta property="og:title" content="COVID-19 Tracker" />
+        <meta property="og:description" content="Animated COVID-19 visualization using WebGL and Mapbox GL JS API. Based on on data from the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University." />
+        <meta
+            property="og:image"
+            content="https://alex.gl/corona/corona.jpg"
+        />
+
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://alex.gl/corona/" />
+        <meta property="twitter:title" content="COVID-19 Tracker" />
+        <meta
+            property="twitter:description"
+            content="Animated COVID-19 visualization using WebGL and Mapbox GL JS API. Based on on data from the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University."
+        />
+        <meta
+            property="twitter:image"
+            content="https://alex.gl/demos/corona/corona.jpg"
+        />
+
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css" rel="stylesheet" />
+        <link href="style.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="control-panel">
+            <button class="play-button">
+                <img src="play.svg" class="icon play" />
+                <img src="pause.svg" class="icon pause hidden" />
+            </button>
+            <div class="date-indicator"></div>
+            <input type="range" class="date-slider" min="0" max="1" step="any" value="1" />
+        </div>
+
+        <div class="wrapper">
+            <div class="map-container">
+                <div class="map"></div>
+                <div class="scope"></div>
+            </div>
+
+            <div class="sidebar mode-map">
+                <div class="region-list">
+                    <div class="row-selector">
+                        <div class="row-selector-button active" data-row="cases">Cases</div>
+                        <div class="row-selector-button" data-row="deaths">Deaths</div>
+                    </div>
+                    <div class="countries row-cases"></div>
+                </div>
+                <div class="card">
+                    <div class="close-button">
+                        <img src="cross.svg" class="icon close" />
+                    </div>
+                    <div class="card-header"></div>
+                    <div class="card-subheader"></div>
+                    <div class="chart"></div>
+                    <div class="chart-counters">
+                        <div class="chart-counter cases">
+                            <div class="chart-counter-caption">Cases</div>
+                            <div class="chart-counter-number"></div>
+                        </div>
+                        <div class="chart-counter deaths">
+                            <div class="chart-counter-caption">Deaths</div>
+                            <div class="chart-counter-number"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mode-selector">
+                <div class="mode-selector-button active" data-mode="map">
+                    <img class="icon-map" src="map.svg" /><span>Map</span>
+                </div>
+                <div class="mode-selector-button" data-mode="list">
+                    <img class="icon-table" src="table.svg" /><span>Table</span>
+                </div>
+                <div class="mode-selector-button" data-mode="card">
+                    <img class="icon-chart" src="chart.svg" /><span>Chart</span>
+                </div>
+            </div>
+        </div>
+        <script src="bundle.js"></script>
+    </body>
+</html>
