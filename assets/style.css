@@ -4,7 +4,7 @@ body {
     height: 100%;
     padding: 0;
     margin: 0;
-    font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
 }
@@ -298,6 +298,7 @@ body {
 }
 
 .row-selector-button {
+    font-size: 16px;
     box-sizing: border-box;
     flex-grow: 1;
     font-weight: bold;
@@ -344,8 +345,8 @@ body {
     position: absolute;
     right: 15px;
     top: 15px;
-    width: 20px;
-    height: 20px;
+    width: 17px;
+    height: 17px;
     cursor: pointer;
 }
 
@@ -355,7 +356,7 @@ body {
 }
 
 .card-header {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     color: #333;
 }
@@ -387,10 +388,10 @@ body {
 }
 
 .chart-counter-caption {
-    font-size: 24px;
+    font-weight: bold;
+    font-size: 16px;
 }
 .chart-counter-number {
-    margin-top: -5px;
     font-size: 36px;
     font-weight: bold;
 }
@@ -448,6 +449,7 @@ body {
         font-weight: bold;
         cursor: pointer;
         text-align: center;
+        color: #333;
         background-color: #efefef;
         vertical-align: middle;
     }
