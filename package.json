@@ -1,7 +1,7 @@
 {
   "name": "corona",
   "version": "1.0.0",
-  "description": "Mapcreator test assignment",
+  "description": "COVID-19 Tracker",
   "main": "src/index.js",
   "scripts": {
     "start": "webpack-dev-server",
