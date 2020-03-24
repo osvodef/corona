@@ -91,28 +91,22 @@ body {
     height: 35px;
     margin: 5px 5px 5px 10px;
     cursor: pointer;
-    color: #fff;
     background-color: transparent;
     border: none;
     outline: none;
+    padding: 0;
     flex-shrink: 0;
-    border: 2px solid #eee;
-    border-radius: 50%;
     overflow: hidden;
 }
 
 .icon.play {
     width: 35px;
     height: 35px;
-    margin-top: -3px;
-    margin-left: -6px;
 }
 
 .icon.pause {
     width: 35px;
     height: 35px;
-    margin-top: -3px;
-    margin-left: -8px;
 }
 
 .icon.hidden {
@@ -162,6 +156,7 @@ body {
     margin: 5px;
     color: #eee;
     font-size: 16px;
+    font-weight: bold;
     user-select: none;
 }
 
@@ -255,16 +250,15 @@ body {
 .icon.expand,
 .icon.expand-hover {
     pointer-events: none;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     margin-left: 10px;
-    transform: rotate(180deg);
     transition: transform 0.4s;
 }
 
 .country.expanded .icon.expand,
 .country.expanded .icon.expand-hover {
-    transform: rotate(0);
+    transform: rotate(180deg);
 }
 
 .country-info:hover {
@@ -348,10 +342,10 @@ body {
 
 .close-button {
     position: absolute;
-    right: 14px;
-    top: 12px;
-    width: 15px;
-    height: 15px;
+    right: 15px;
+    top: 15px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
 }
 
