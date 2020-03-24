@@ -1,6 +1,6 @@
 import mapbox from 'mapbox-gl';
 import { Scope } from './scope';
-import { calcDate, isMobileLayout } from '../utils';
+import { calcDate, isNarrowScreen } from '../utils';
 import dateLib from 'date-and-time';
 import { Model, RowName, Region, Country, ModeName } from '../types';
 import { RegionList } from './regionList';
@@ -11,6 +11,7 @@ import { initialBounds } from '../constants';
 export class App {
     private map: mapboxgl.Map;
     private model: Model;
+
     private sidebar: HTMLDivElement;
 
     private regionList: RegionList;
@@ -24,6 +25,7 @@ export class App {
         this.map = map;
         this.model = model;
 
+        const tooltip = container.querySelector('.tooltip') as HTMLDivElement;
         const sidebar = container.querySelector('.sidebar') as HTMLDivElement;
         const cardElement = container.querySelector('.card') as HTMLDivElement;
         const scopeElement = container.querySelector('.scope') as HTMLDivElement;
@@ -41,7 +43,7 @@ export class App {
         ) as NodeListOf<HTMLDivElement>;
 
         const regionList = new RegionList(regionListElement, model);
-        const scope = new Scope(scopeElement, map, model);
+        const scope = new Scope(scopeElement, tooltip, map, model);
         const card = new Card(cardElement, model);
 
         scope.on('daychange', () => {
@@ -185,7 +187,7 @@ export class App {
         this.map.easeTo({
             center: [region.lng, region.lat],
             zoom: 3,
-            offset: !isMobileLayout() ? [240, 100] : [0, 100],
+            offset: !isNarrowScreen() ? [240, 100] : [0, 100],
             duration: 800,
         });
     }
@@ -207,14 +209,14 @@ export class App {
             bounds.extend(new mapbox.LngLat(region.lng, region.lat));
         }
         this.map.fitBounds(bounds, {
-            padding: { left: !isMobileLayout() ? 480 : 0, top: 0, right: 0, bottom: 0 },
+            padding: { left: !isNarrowScreen() ? 580 : 100, top: 100, right: 100, bottom: 100 },
             duration: 800,
         });
     }
 
     private focusOnWorld(): void {
         this.map.fitBounds(initialBounds, {
-            padding: { left: !isMobileLayout() ? 480 : 0, top: 0, right: 0, bottom: 0 },
+            padding: { left: !isNarrowScreen() ? 480 : 0, top: 0, right: 0, bottom: 0 },
             duration: 800,
         });
     }

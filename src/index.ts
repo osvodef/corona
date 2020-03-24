@@ -1,5 +1,5 @@
 import mapbox from 'mapbox-gl';
-import { isMobile, isMobileLayout } from './utils';
+import { isMobile, isNarrowScreen } from './utils';
 import { buildModel } from './model';
 import { App } from './components/app';
 import { mapAttribution, initialBounds, initialBearing, initialPitch, mapStyle } from './constants';
@@ -22,7 +22,7 @@ const map = new mapbox.Map({
             top: 0,
             right: 0,
             bottom: 0,
-            left: !isMobileLayout() ? 480 : 0,
+            left: !isNarrowScreen() ? 480 : 0,
         },
     },
     logoPosition: 'top-right',

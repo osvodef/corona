@@ -1,18 +1,31 @@
 import vertexShader from '../webgl/shaders/render.vert.glsl';
 import fragmentShader from '../webgl/shaders/frag.glsl';
 
+import { getMvpMatrix } from '../mvp';
 import { Picker } from '../webgl/picker';
 import { Column } from '../webgl/column';
-import { Program } from '../webgl/program';
-import { getMvpMatrix } from '../mvp';
 import { Model, RowName } from '../types';
+import { Program } from '../webgl/program';
 import { animationSpeed } from '../constants';
-import { clamp, lerpArrayValues, calcColumnHeight, calcColumnColor } from '../utils';
 import { EventEmitter } from '../eventEmitter';
+import {
+    clamp,
+    lerpArrayValues,
+    calcColumnHeight,
+    calcColumnColor,
+    debounce,
+    isMobile,
+} from '../utils';
 
 export class Scope extends EventEmitter {
-    private container: HTMLElement;
+    private container: HTMLDivElement;
     private canvas: HTMLCanvasElement;
+
+    private tooltip: HTMLDivElement;
+    private tooltipHeader: HTMLDivElement;
+    private tooltipSubheader: HTMLDivElement;
+    private tooltipCaseCount: HTMLDivElement;
+    private tooltipDeathsCount: HTMLDivElement;
 
     private gl: WebGLRenderingContext;
     private renderingProgram: Program;
@@ -36,13 +49,28 @@ export class Scope extends EventEmitter {
 
     private selectedColumns: Set<string>;
 
+    private debouncedShowTooltip: (x: number, y: number) => void;
+
     private needsRerender: boolean;
 
-    constructor(container: HTMLElement, map: mapboxgl.Map, model: Model) {
+    constructor(
+        container: HTMLDivElement,
+        tooltip: HTMLDivElement,
+        map: mapboxgl.Map,
+        model: Model,
+    ) {
         super();
 
         this.container = container;
+        this.tooltip = tooltip;
         this.canvas = document.createElement('canvas');
+
+        this.tooltipHeader = tooltip.querySelector('.tooltip-header') as HTMLDivElement;
+        this.tooltipSubheader = tooltip.querySelector('.tooltip-subheader') as HTMLDivElement;
+        this.tooltipCaseCount = tooltip.querySelector('.tooltip-counter.cases') as HTMLDivElement;
+        this.tooltipDeathsCount = tooltip.querySelector(
+            '.tooltip-counter.deaths',
+        ) as HTMLDivElement;
 
         container.appendChild(this.canvas);
 
@@ -94,6 +122,8 @@ export class Scope extends EventEmitter {
 
         this.resetSize();
 
+        this.debouncedShowTooltip = debounce(this.showTooltip, 100);
+
         map.on('move', () => {
             this.updateMvpMatrix();
         });
@@ -103,8 +133,17 @@ export class Scope extends EventEmitter {
         });
 
         map.on('click', (e) => {
-            const { x, y } = e.point;
-            this.fire('click', this.picker.pick(x, y));
+            this.fire('click', this.picker.pick(e.point.x, e.point.y));
+        });
+
+        map.on('mousemove', (e) => {
+            if (!isMobile) {
+                this.debouncedShowTooltip(e.point.x, e.point.y);
+
+                if (this.picker.pick(e.point.x, e.point.y) === undefined) {
+                    this.tooltip.style.display = 'none';
+                }
+            }
         });
 
         this.renderLoop();
@@ -215,6 +254,29 @@ export class Scope extends EventEmitter {
         this.picker.setSize(width, height);
 
         this.updateMvpMatrix();
+    };
+
+    private showTooltip = (x: number, y: number): void => {
+        const column = this.picker.pick(x, y);
+        if (column === undefined) {
+            this.tooltip.style.display = 'none';
+            return;
+        }
+
+        this.tooltip.style.display = 'block';
+        this.tooltip.style.transform = `translate(${x + 15}px, ${y + 15}px)`;
+
+        const { region, country } = column;
+
+        const title = region.name !== '' ? region.name : country.name;
+        const subtitle = region.name !== '' ? country.name : '';
+
+        const dayIndex = Math.floor(this.day);
+
+        this.tooltipHeader.innerText = title;
+        this.tooltipSubheader.innerText = subtitle;
+        this.tooltipCaseCount.innerText = String(region.rows['cases'][dayIndex]);
+        this.tooltipDeathsCount.innerText = String(region.rows['deaths'][dayIndex]);
     };
 
     private renderLoop = (): void => {

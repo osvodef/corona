@@ -38,7 +38,7 @@ export function formatNumber(x: number): string {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
-export function isMobileLayout(): boolean {
+export function isNarrowScreen(): boolean {
     return document.body.clientWidth <= 800;
 }
 

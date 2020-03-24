@@ -12,7 +12,6 @@ export const dayOne = new Date(2020, 0, 22);
 export const dateFormat = 'M/D/YY';
 
 export const mapStyle = 'mapbox://styles/mapbox/dark-v10';
-// export const mapStyle = 'https://vapi.mapcreator.io/styles/Mapcreator%20dark.json';
 export const mapAttribution =
     '<a href="https://alex.gl/">Alex Fedosov</a> | <a href="https://github.com/CSSEGISandData">JHU CSSE</a>';
 
