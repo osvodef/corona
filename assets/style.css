@@ -229,7 +229,7 @@ body {
     height: 100%;
     flex-grow: 0;
     flex-shrink: 0;
-    margin-top: 10px;
+    margin-top: 14px;
     color: #111;
 }
 
@@ -261,8 +261,13 @@ body {
     transform: rotate(180deg);
 }
 
-.country-info:hover {
-    background-color: #efefef;
+.countries.row-cases .country-info:hover,
+.countries.row-cases .region:hover {
+    background-color: rgba(209, 229, 240, 0.25);
+}
+.countries.row-deaths .country-info:hover,
+.countries.row-deaths .region:hover {
+    background-color: rgba(253, 219, 199, 0.25);
 }
 
 .country-regions {
@@ -283,10 +288,6 @@ body {
     padding: 5px 15px;
     margin: 5px 10px 5px 35px;
     border-radius: 5px;
-}
-
-.region:hover {
-    background-color: #efefef;
 }
 
 .row-selector {
