@@ -15,6 +15,7 @@ import {
     calcColumnColor,
     debounce,
     isMobile,
+    isNarrowScreen,
 } from '../utils';
 
 export class Scope extends EventEmitter {
@@ -323,7 +324,7 @@ export class Scope extends EventEmitter {
         this.renderingProgram.bindUniform('mvp', ...this.mvp);
 
         const maxValue = this.model.maxValues[this.row];
-        const selectionMode = this.selectedColumns.size > 0;
+        const selectionMode = this.selectedColumns.size > 0 && !isNarrowScreen();
 
         for (const column of columns) {
             const values = column.region.rows[this.row];
