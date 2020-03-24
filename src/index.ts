@@ -30,8 +30,8 @@ const map = new mapbox.Map({
 });
 
 Promise.all([
-    fetch('assets/data/cases.csv').then((response) => response.text()),
-    fetch('assets/data/deaths.csv').then((response) => response.text()),
+    fetch('data/cases.csv').then((response) => response.text()),
+    fetch('data/deaths.csv').then((response) => response.text()),
 ]).then((results) => {
     const model = buildModel(results[0], results[1]);
 
