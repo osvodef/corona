@@ -116,7 +116,7 @@ body {
 
 .tooltip-counters {
     display: flex;
-    margin-top: 10px;
+    margin-top: 5px;
     font-weight: bold;
 }
 .tooltip-counter.cases {
@@ -519,4 +519,25 @@ body {
         margin-top: 12px;
         margin-right: 5px;
     }
+}
+
+.no-webgl {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #0d0a05;
+    color: #eeeae7;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    text-align: center;
+    user-select: none;
+}
+.no-webgl-cell {
+    display: table-cell;
+    vertical-align: middle;
 }
