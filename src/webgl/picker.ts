@@ -18,7 +18,7 @@ export class Picker {
     private scope: Scope;
     private map: mapboxgl.Map;
 
-    private pixels: Uint8ClampedArray;
+    private pixels: Uint8Array;
 
     private width: number;
     private height: number;
@@ -70,7 +70,7 @@ export class Picker {
 
         this.width = 0;
         this.height = 0;
-        this.pixels = new Uint8ClampedArray(0);
+        this.pixels = new Uint8Array(0);
 
         this.gl = gl;
         this.map = map;
@@ -98,7 +98,7 @@ export class Picker {
 
         this.width = width;
         this.height = height;
-        this.pixels = new Uint8ClampedArray(width * height * 4);
+        this.pixels = new Uint8Array(width * height * 4);
 
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 

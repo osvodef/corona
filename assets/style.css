@@ -71,15 +71,19 @@ body {
     position: relative;
 }
 
-.scope,
-.map {
+.scope {
     position: absolute;
     width: 100%;
     height: 100%;
 }
 
 .map {
-    background-color: #191b1b;
+    position: absolute;
+    top: -1px;
+    bottom: -1px;
+    left: -1px;
+    right: -1px;
+    background-color: #191a1a;
 }
 
 .scope {
