@@ -449,13 +449,18 @@ body {
         height: calc(100% - 40px);
     }
 
-    .sidebar.sidebar.mode-list,
-    .sidebar.sidebar.mode-card {
+    .sidebar.mode-list,
+    .sidebar.mode-map,
+    .sidebar.mode-card {
         width: 100%;
         height: calc(100% - 40px);
+        transition: transform 0.25s;
+        background-color: #fff;
     }
-
     .sidebar.mode-map {
+        transform: translate(0, 100%);
+    }
+    .sidebar.mode-map .region-list {
         display: none;
     }
 
