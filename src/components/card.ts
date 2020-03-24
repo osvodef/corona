@@ -3,7 +3,7 @@ import { calcDate, formatNumber } from '../utils';
 import { EventEmitter } from '../eventEmitter';
 import dateLib from 'date-and-time';
 
-const width = 465;
+const width = 460;
 const height = 300;
 
 const padding = {
@@ -119,13 +119,13 @@ export class Card extends EventEmitter {
 
     private getChartMarkup(rows: Rows): string {
         let offset = 0;
-        while (rows.cases[offset] === 0) {
+        while (rows.cases[offset] === 0 && rows.deaths[offset] === 0) {
             offset++;
         }
         offset = Math.max(offset - 1, 0);
 
         const dayCount = this.model.dayCount - offset;
-        const maxValue = Math.max(...rows.cases);
+        const maxValue = Math.max(...rows.cases, ...rows.deaths);
         const barWidth = (chartRight - chartLeft) / dayCount;
         const heightMultiplier = (chartBottom - chartTop) / maxValue;
 
@@ -151,7 +151,7 @@ export class Card extends EventEmitter {
 
             if (activeHeight > 0) {
                 const y = chartBottom - deathsHeight - activeHeight;
-                rects += this.rect(x, y, barWidth, activeHeight, '#92c5de');
+                rects += this.rect(x, y, barWidth, activeHeight, '#4393c3');
             }
         }
 
