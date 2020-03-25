@@ -21,6 +21,8 @@ export class App {
     private rowSelectorButtons: NodeListOf<HTMLDivElement>;
     private modeSelectorButtons: NodeListOf<HTMLDivElement>;
 
+    private day: number;
+
     constructor(container: HTMLElement, map: mapboxgl.Map, model: Model) {
         this.map = map;
         this.model = model;
@@ -44,13 +46,14 @@ export class App {
 
         const regionList = new RegionList(regionListElement, model);
         const scope = new Scope(scopeElement, tooltip, map, model);
-        const card = new Card(cardElement, model);
+        const card = new Card(cardElement, this, model);
 
         scope.on('daychange', () => {
             const day = scope.getDay();
 
             regionList.setDay(day);
             card.setDay(day);
+            this.day = day;
 
             dateSlider.value = String(day);
             dateIndicator.innerText = dateLib.format(calcDate(day), 'DD.MM.YYYY');
@@ -139,7 +142,11 @@ export class App {
             scope.setDay(day);
             regionList.setDay(day);
             card.setDay(day);
+
+            this.day = day;
         });
+
+        this.day = this.model.dayCount - 1;
 
         this.scope = scope;
         this.regionList = regionList;
@@ -148,6 +155,16 @@ export class App {
 
         this.rowSelectorButtons = rowSelectorButtons;
         this.modeSelectorButtons = modeSelectorButtons;
+    }
+
+    public getDay(): number {
+        return this.day;
+    }
+
+    public setDay(day: number): void {
+        this.scope.setDay(day);
+        this.regionList.setDay(day);
+        this.card.setDay(day);
     }
 
     private setMode(mode: ModeName): void {

@@ -2,15 +2,16 @@ import { Country, Region, Rows, Model } from '../types';
 import { calcDate, formatNumber } from '../utils';
 import { EventEmitter } from '../eventEmitter';
 import dateLib from 'date-and-time';
+import { App } from './app';
 
-const width = 460;
+const width = 440;
 const height = 300;
 
 const padding = {
-    top: 5,
-    right: 35,
+    top: 0,
+    right: 0,
     bottom: 15,
-    left: 15,
+    left: 0,
 };
 
 const chartTop = padding.top;
@@ -20,7 +21,7 @@ const chartLeft = padding.left;
 const chartRight = width - padding.right;
 
 const crispEdges = 'shape-rendering="crispEdges"';
-const tickFont = 'font: 10px sans-serif;';
+const tickFont = 'font: 12px sans-serif; font-weight: bold; opacity: 0.5;';
 
 export class Card extends EventEmitter {
     private subheader: HTMLDivElement;
@@ -35,9 +36,12 @@ export class Card extends EventEmitter {
 
     private dayCount: number;
 
+    private app: App;
     private model: Model;
 
-    constructor(container: HTMLDivElement, model: Model) {
+    private isDraggingOnChart: boolean;
+
+    constructor(container: HTMLDivElement, app: App, model: Model) {
         super();
 
         const header = container.querySelector('.card-header') as HTMLDivElement;
@@ -60,6 +64,7 @@ export class Card extends EventEmitter {
         this.header = header;
         this.chart = chart;
         this.model = model;
+        this.app = app;
 
         this.dayCount = 0;
 
@@ -68,6 +73,8 @@ export class Card extends EventEmitter {
 
         this.casesCount = casesCount;
         this.deathsCount = deathsCount;
+
+        this.isDraggingOnChart = false;
 
         this.renderWorld();
     }
@@ -83,6 +90,7 @@ export class Card extends EventEmitter {
 
         this.rows = rows;
         this.setDay(this.day);
+        this.bindEvents();
     }
 
     public renderWorld(): void {
@@ -92,6 +100,7 @@ export class Card extends EventEmitter {
 
         this.rows = this.model.rows;
         this.setDay(this.day);
+        this.bindEvents();
     }
 
     public setDay(day: number): void {
@@ -103,40 +112,33 @@ export class Card extends EventEmitter {
         const offset = this.model.dayCount - this.dayCount;
         const barWidth = (chartRight - chartLeft) / this.dayCount;
 
-        const inBound = day - offset >= 0 && day - offset < this.dayCount - 1;
-        if (inBound) {
-            runner.style.visibility = 'visible';
-        } else {
-            runner.style.visibility = 'hidden';
-        }
-
-        const x = chartLeft + barWidth * Math.max(day - offset, 0);
-        runner.setAttribute('x1', String(x));
-        runner.setAttribute('x2', String(x));
+        const x = chartLeft + barWidth * Math.floor(day - offset);
+        runner.setAttribute('x', String(x));
 
         this.day = day;
     }
 
     private getChartMarkup(rows: Rows): string {
-        let offset = 0;
-        while (rows.cases[offset] === 0 && rows.deaths[offset] === 0) {
-            offset++;
-        }
-        offset = Math.max(offset - 1, 0);
-
-        const dayCount = this.model.dayCount - offset;
         const maxValue = Math.max(...rows.cases, ...rows.deaths);
-        const barWidth = (chartRight - chartLeft) / dayCount;
         const heightMultiplier = (chartBottom - chartTop) / maxValue;
 
-        const horizontalTickCount = Math.min(dayCount, 5);
-        const verticalTickCount = 10;
-        const tickSize = 5;
+        let offset = 0;
+        while (
+            rows.cases[offset] * heightMultiplier < 1 &&
+            rows.deaths[offset] * heightMultiplier < 1
+        ) {
+            offset++;
+        }
+
+        const dayCount = this.model.dayCount - offset;
+        const barWidth = (chartRight - chartLeft) / dayCount;
+        const captionCount = Math.min(dayCount, 3);
 
         this.dayCount = dayCount;
 
-        let rects = '';
+        let svg = '';
 
+        // Main rectangles
         for (let i = 0; i < dayCount; i++) {
             const casesHeight = rows.cases[offset + i] * heightMultiplier;
             const deathsHeight = rows.deaths[offset + i] * heightMultiplier;
@@ -146,79 +148,128 @@ export class Card extends EventEmitter {
 
             if (deathsHeight > 0) {
                 const y = chartBottom - deathsHeight;
-                rects += this.rect(x, y, barWidth, deathsHeight, '#b2182b');
+                svg += this.rect(x, y, barWidth, deathsHeight, '#b2182b');
             }
 
             if (activeHeight > 0) {
                 const y = chartBottom - deathsHeight - activeHeight;
-                rects += this.rect(x, y, barWidth, activeHeight, '#4393c3');
+                svg += this.rect(x, y, barWidth, activeHeight, '#4393c3');
             }
         }
 
-        let axes = '';
+        // Bottom captions
+        const captionStep = Math.ceil(dayCount / captionCount);
+        for (let day = 0; day < dayCount - captionStep / 2; day += captionStep) {
+            const x = day === 0 ? chartLeft : chartLeft + barWidth * (day + 0.5);
 
-        // Рисуем горизонтальную и вертикальную оси
-        axes += this.line(chartLeft, chartBottom, chartRight, chartBottom);
-        axes += this.line(chartRight, chartTop, chartRight, chartBottom);
+            const textStyle =
+                day === 0
+                    ? `${tickFont}; text-anchor: start;`
+                    : `${tickFont}; text-anchor: middle;`;
 
-        // Рисуем линию-индикатор текущей даты
-        axes += this.line(0, chartTop, 0, chartBottom, 'runner');
-
-        // Рисуем горизонтальные отметки и подписи к ним
-        const horizontalStep = Math.ceil(dayCount / horizontalTickCount);
-        const textStyle = `${tickFont}; text-anchor: middle;`;
-        for (let day = 0; day < dayCount; day += horizontalStep) {
-            const x = chartLeft + barWidth * day;
-
-            axes += this.line(x, chartBottom, x, chartBottom + tickSize);
-            axes += this.text(this.formatDay(offset + day), x, height, textStyle);
+            svg += this.text(this.formatDay(offset + day), x, height, textStyle);
         }
-        axes += this.line(chartRight, chartBottom, chartRight, chartBottom + tickSize);
+        svg += this.text(
+            this.formatDay(offset + dayCount - 1),
+            chartRight,
+            height,
+            `${tickFont}; text-anchor: end;`,
+        );
 
-        // Рисуем вертикальные отметки и подписи к ним
-        const verticalStep = Math.max(10 ** Math.ceil(Math.log10(maxValue / verticalTickCount)), 1);
+        // Current date indicator
+        svg += this.rect(0, chartTop, barWidth, chartBottom, 'rgba(0, 0, 0, 0.1)', 'runner');
 
-        for (let value = 0; value <= maxValue; value += verticalStep) {
-            const y = chartBottom - value * heightMultiplier;
-
-            axes += this.line(chartRight, y, chartRight + tickSize, y);
-            axes += this.text(this.formatValue(value), chartRight + 10, y + 4, tickFont);
-        }
-        axes += this.line(chartRight, chartTop, chartRight + tickSize, chartTop);
+        svg += this.rect(
+            chartLeft,
+            chartTop,
+            chartRight - chartLeft,
+            chartBottom - chartTop,
+            'transparent',
+            'chart-overlay',
+        );
 
         return `
-            <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-                ${rects}
-                ${axes}
+            <svg class="chart-svg" width="100%" height="100%" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+                ${svg}
             </svg>
         `;
     }
 
-    private rect(x: number, y: number, width: number, height: number, fill: string): string {
-        return `<rect ${crispEdges} fill="${fill}" x="${x}" y="${y}" width="${width}" height="${height}" />`;
-    }
-
-    private line(x1: number, y1: number, x2: number, y2: number, className?: string): string {
-        return `<line ${crispEdges} x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" class="${className}"/>`;
+    private rect(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        fill: string,
+        className?: string,
+    ): string {
+        const classString = className !== undefined ? `class="${className}"` : '';
+        return `<rect ${crispEdges} fill="${fill}" x="${x}" y="${y}" width="${width}" height="${height}" ${classString} />`;
     }
 
     private text(text: string, x: number, y: number, style: string): string {
         return `<text style="${style}" x="${x}" y="${y}">${text}</text>`;
     }
 
-    private formatValue(value: number): string {
-        if (value >= 1000000) {
-            return `${value / 1000000}m`;
-        }
-
-        if (value >= 1000) {
-            return `${value / 1000}k`;
-        }
-
-        return String(value);
-    }
-
     private formatDay(day: number): string {
         return dateLib.format(calcDate(day), 'DD.MM');
+    }
+
+    private bindEvents(): void {
+        const svg = this.chart.querySelector('.chart-svg') as SVGElement;
+        const overlay = this.chart.querySelector('.chart-overlay') as SVGRectElement;
+
+        overlay.addEventListener('mousemove', (e) => {
+            const barIndex = Math.floor((e.offsetX / svg.clientWidth) * this.dayCount);
+
+            if (barIndex < 0 || barIndex > this.dayCount - 1) {
+                return;
+            }
+
+            const day = this.model.dayCount - this.dayCount + barIndex;
+
+            if (this.isDraggingOnChart) {
+                this.app.setDay(day);
+            } else {
+                this.setDay(day);
+            }
+        });
+
+        overlay.addEventListener('mouseleave', () => {
+            this.isDraggingOnChart = false;
+            this.setDay(this.app.getDay());
+        });
+
+        overlay.addEventListener('mousedown', () => {
+            this.isDraggingOnChart = true;
+        });
+
+        overlay.addEventListener('mouseup', () => {
+            this.isDraggingOnChart = false;
+        });
+
+        overlay.addEventListener('click', (e) => {
+            const barIndex = Math.floor((e.offsetX / svg.clientWidth) * this.dayCount);
+
+            if (barIndex < 0 || barIndex > this.dayCount - 1) {
+                return;
+            }
+
+            const day = this.model.dayCount - this.dayCount + barIndex;
+
+            this.app.setDay(day);
+        });
+
+        overlay.addEventListener('touchmove', (e) => {
+            const barIndex = Math.floor((e.touches[0].clientX / svg.clientWidth) * this.dayCount);
+
+            if (barIndex < 0 || barIndex > this.dayCount - 1) {
+                return;
+            }
+
+            const day = this.model.dayCount - this.dayCount + barIndex;
+
+            this.app.setDay(day);
+        });
     }
 }
