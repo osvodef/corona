@@ -16,6 +16,7 @@ import {
     debounce,
     isMobile,
     isNarrowScreen,
+    formatNumber,
 } from '../utils';
 
 export class Scope extends EventEmitter {
@@ -276,8 +277,8 @@ export class Scope extends EventEmitter {
 
         this.tooltipHeader.innerText = title;
         this.tooltipSubheader.innerText = subtitle;
-        this.tooltipCaseCount.innerText = String(region.rows['cases'][dayIndex]);
-        this.tooltipDeathsCount.innerText = String(region.rows['deaths'][dayIndex]);
+        this.tooltipCaseCount.innerText = formatNumber(region.rows['cases'][dayIndex]);
+        this.tooltipDeathsCount.innerText = formatNumber(region.rows['deaths'][dayIndex]);
     };
 
     private renderLoop = (): void => {
