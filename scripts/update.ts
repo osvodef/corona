@@ -84,11 +84,20 @@ async function run(): Promise<void> {
         }
 
         for (const date of dateList) {
-            if (Number.isNaN(Number(casesRecord[date]))) {
+            const cases = Number(casesRecord[date]);
+            const deaths = Number(deathsRecord[date]);
+
+            if (Number.isNaN(cases)) {
                 throw new Error(`Invalid value in cases file, row #${i}, date ${date}`);
             }
-            if (Number.isNaN(Number(deathsRecord[date]))) {
+            if (cases < 0) {
+                throw new Error(`Negative value in cases file, row #${i}, date ${date}`);
+            }
+            if (Number.isNaN(deaths)) {
                 throw new Error(`Invalid value in deaths file, row #${i}, date ${date}`);
+            }
+            if (deaths < 0) {
+                throw new Error(`Negative value in deaths file, row #${i}, date ${date}`);
             }
         }
     }
