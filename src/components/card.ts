@@ -30,6 +30,8 @@ export class Card extends EventEmitter {
 
     private casesCount: HTMLDivElement;
     private deathsCount: HTMLDivElement;
+    private casesCaption: HTMLDivElement;
+    private deathsCaption: HTMLDivElement;
 
     private day: number;
     private rows: Rows;
@@ -56,6 +58,13 @@ export class Card extends EventEmitter {
             '.chart-counter.deaths .chart-counter-number',
         ) as HTMLDivElement;
 
+        const casesCaption = container.querySelector(
+            '.chart-counter.cases .chart-counter-caption',
+        ) as HTMLDivElement;
+        const deathsCaption = container.querySelector(
+            '.chart-counter.deaths .chart-counter-caption',
+        ) as HTMLDivElement;
+
         closeButton.addEventListener('click', () => {
             this.fire('close');
         });
@@ -73,6 +82,8 @@ export class Card extends EventEmitter {
 
         this.casesCount = casesCount;
         this.deathsCount = deathsCount;
+        this.casesCaption = casesCaption;
+        this.deathsCaption = deathsCaption;
 
         this.isDraggingOnChart = false;
 
@@ -104,8 +115,14 @@ export class Card extends EventEmitter {
     }
 
     public setDay(day: number): void {
-        this.casesCount.innerText = formatNumber(this.rows.cases[Math.floor(day)]);
-        this.deathsCount.innerText = formatNumber(this.rows.deaths[Math.floor(day)]);
+        const cases = this.rows.cases[Math.floor(day)];
+        const deaths = this.rows.deaths[Math.floor(day)];
+
+        this.casesCount.innerText = formatNumber(cases);
+        this.deathsCount.innerText = formatNumber(deaths);
+
+        this.casesCaption.innerText = cases === 1 ? 'case' : 'cases';
+        this.deathsCaption.innerText = deaths === 1 ? 'death' : 'deaths';
 
         const runner = this.chart.querySelector('.runner') as SVGLineElement;
 
