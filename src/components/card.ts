@@ -21,7 +21,8 @@ const chartLeft = padding.left;
 const chartRight = width - padding.right;
 
 const crispEdges = 'shape-rendering="crispEdges"';
-const tickFont = 'font: 12px sans-serif; font-weight: bold; opacity: 0.5;';
+const captionFont =
+    "font: 12px 'Roboto', Arial, Helvetica, sans-serif; font-weight: bold; opacity: 0.5";
 
 export class Card extends EventEmitter {
     private subheader: HTMLDivElement;
@@ -181,8 +182,8 @@ export class Card extends EventEmitter {
 
             const textStyle =
                 day === 0
-                    ? `${tickFont}; text-anchor: start;`
-                    : `${tickFont}; text-anchor: middle;`;
+                    ? `${captionFont}; text-anchor: start;`
+                    : `${captionFont}; text-anchor: middle;`;
 
             svg += this.text(this.formatDay(offset + day), x, height, textStyle);
         }
@@ -190,7 +191,7 @@ export class Card extends EventEmitter {
             this.formatDay(offset + dayCount - 1),
             chartRight,
             height,
-            `${tickFont}; text-anchor: end;`,
+            `${captionFont}; text-anchor: end;`,
         );
 
         // Current date indicator
