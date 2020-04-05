@@ -25,7 +25,7 @@ export const initialBounds: LngLatBoundsLike = [
 export const columnFaceCount = 4;
 export const columnHeight = 25000000;
 export const columnWidth = 8500000;
-export const animationSpeed = 7.5;
+export const animationSpeed = 15;
 
 export const casesPalette = [
     '#ffffd9',
