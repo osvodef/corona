@@ -52,11 +52,6 @@ export function buildModel(casesCsv: string, deathsCsv: string): Model {
                 }),
             };
 
-            if (country.regions.length === 1 && country.regions[0].name !== '') {
-                country.name = `${country.name} (${country.regions[0].name})`;
-                country.regions[0].name = '';
-            }
-
             return country;
         }),
     };
