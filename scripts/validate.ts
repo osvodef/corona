@@ -60,14 +60,28 @@ for (let i = 0; i < cases.length; i++) {
     const casesRecord = cases[i];
     const deathsRecord = deaths[i];
 
-    for (const column of usedColumns) {
-        if (casesRecord[column] !== deathsRecord[column]) {
-            throw new Error(`Region data mismatch in row #${i}`);
-        }
+    if (
+        casesRecord['Country/Region'] !== deathsRecord['Country/Region'] ||
+        casesRecord['Province/State'] !== deathsRecord['Province/State']
+    ) {
+        throw new Error(`Country/region names mismatch in row #${i}`);
     }
 
-    const lon = Number(casesRecord['Long']);
-    const lng = Number(casesRecord['Lat']);
+    const casesLon = Number(casesRecord['Long']);
+    const casesLng = Number(casesRecord['Lat']);
+
+    const deathsLon = Number(deathsRecord['Long']);
+    const deathsLng = Number(deathsRecord['Lat']);
+
+    if (
+        Math.round(casesLon) !== Math.round(deathsLon) ||
+        Math.round(casesLng) !== Math.round(deathsLng)
+    ) {
+        throw new Error(`Coordinates mismatch in row #${i}`);
+    }
+
+    const lon = casesLon;
+    const lng = casesLng;
     if (Number.isNaN(lon) || lon < -180 || lon > 180) {
         throw new Error(`Invalid longtitude, row #${i}`);
     }
