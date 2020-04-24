@@ -1,3 +1,4 @@
+import * as stringify from 'csv-stringify/lib/sync';
 import * as parse from 'csv-parse/lib/sync';
 import { dayOne } from '../src/constants';
 import * as path from 'path';
@@ -89,24 +90,31 @@ for (let i = 0; i < cases.length; i++) {
         throw new Error(`Invalid latitude, row #${i}`);
     }
 
-    for (const date of dateList) {
+    for (let i = 0; i < dateList.length; i++) {
+        const date = dateList[i];
+        const prevDate = dateList[i - 1];
+
         const cases = Number(casesRecord[date]);
         const deaths = Number(deathsRecord[date]);
 
         if (Number.isNaN(cases)) {
             throw new Error(`Invalid value in cases file, row #${i}, date ${date}`);
         }
-        if (cases < 0) {
-            throw new Error(`Negative value in cases file, row #${i}, date ${date}`);
-        }
         if (Number.isNaN(deaths)) {
             throw new Error(`Invalid value in deaths file, row #${i}, date ${date}`);
         }
+
+        if (cases < 0) {
+            casesRecord[date] = String(i > 0 ? Number(casesRecord[prevDate]) : 0);
+        }
         if (deaths < 0) {
-            throw new Error(`Negative value in deaths file, row #${i}, date ${date}`);
+            deathsRecord[date] = String(i > 0 ? Number(deathsRecord[prevDate]) : 0);
         }
     }
 }
+
+fs.writeFileSync(path.join(dataPath, 'cases.csv'), stringify(cases, { header: true }));
+fs.writeFileSync(path.join(dataPath, 'deaths.csv'), stringify(deaths, { header: true }));
 
 function getDayCount(headers: string[]): number {
     return headers.filter((header) => isDate(header)).length;
