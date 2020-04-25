@@ -1,5 +1,5 @@
 import { Region, Country } from '../types';
-import { projectGeoToMap } from '../utils';
+import { MercatorCoordinate } from 'mapbox-gl';
 import { columnFaceCount, columnWidth } from '../constants';
 
 export class Column {
@@ -23,31 +23,31 @@ export class Column {
         this.country = country;
         this.key = `${country.id}_${region.id}`;
 
-        this.fillBuffers(gl, projectGeoToMap([lng, lat]));
+        this.fillBuffers(gl, MercatorCoordinate.fromLngLat([lng, lat]));
     }
 
-    private fillBuffers(gl: WebGLRenderingContext, center: number[]): void {
+    private fillBuffers(gl: WebGLRenderingContext, center: MercatorCoordinate): void {
         const { positionBuffer, normalBuffer, vertexCount } = this;
 
         const positions = new Float32Array(vertexCount * 3);
         const normals = new Float32Array(vertexCount * 3);
         let positionIndex = 0;
         let normalIndex = 0;
-        const angleStep = (2 * Math.PI) / columnFaceCount;
+        const angleStep = -(2 * Math.PI) / columnFaceCount;
         for (let i = 0; i < columnFaceCount; i++) {
             const wallAngle = angleStep * (i + 0.5);
             const wallAngleCos = Math.cos(wallAngle);
             const wallAngleSin = Math.sin(wallAngle);
 
-            const x1 = center[0] + columnWidth * Math.cos(angleStep * i);
-            const y1 = center[1] + columnWidth * Math.sin(angleStep * i);
+            const x1 = center.x + columnWidth * Math.cos(angleStep * i);
+            const y1 = center.y + columnWidth * Math.sin(angleStep * i);
 
-            const x2 = center[0] + columnWidth * Math.cos(angleStep * (i + 1));
-            const y2 = center[1] + columnWidth * Math.sin(angleStep * (i + 1));
+            const x2 = center.x + columnWidth * Math.cos(angleStep * (i + 1));
+            const y2 = center.y + columnWidth * Math.sin(angleStep * (i + 1));
 
             // Generating the top part:
-            positions[positionIndex++] = center[0];
-            positions[positionIndex++] = center[1];
+            positions[positionIndex++] = center.x;
+            positions[positionIndex++] = center.y;
             positions[positionIndex++] = 1;
             normals[normalIndex++] = 0;
             normals[normalIndex++] = 0;

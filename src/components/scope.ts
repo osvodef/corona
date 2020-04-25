@@ -1,7 +1,6 @@
 import vertexShader from '../webgl/shaders/render.vert.glsl';
 import fragmentShader from '../webgl/shaders/frag.glsl';
 
-import { getMvpMatrix } from '../mvp';
 import { Picker } from '../webgl/picker';
 import { Column } from '../webgl/column';
 import { Model, RowName } from '../types';
@@ -16,6 +15,7 @@ import {
     debounce,
     isMobile,
     formatNumber,
+    getMvp,
 } from '../utils';
 
 export class Scope extends EventEmitter {
@@ -35,7 +35,6 @@ export class Scope extends EventEmitter {
 
     private map: mapboxgl.Map;
 
-    private mvp: number[];
     private width: number;
     private height: number;
 
@@ -87,7 +86,6 @@ export class Scope extends EventEmitter {
 
         this.gl = gl;
         this.map = map;
-        this.mvp = [];
 
         this.model = model;
 
@@ -126,7 +124,7 @@ export class Scope extends EventEmitter {
         this.debouncedShowTooltip = debounce(this.showTooltip, 100);
 
         map.on('move', () => {
-            this.updateMvpMatrix();
+            this.needsRerender = true;
         });
 
         map.on('render', () => {
@@ -168,10 +166,6 @@ export class Scope extends EventEmitter {
 
     public getDay(): number {
         return this.day;
-    }
-
-    public getMvp(): number[] {
-        return this.mvp;
     }
 
     public play(): void {
@@ -232,11 +226,6 @@ export class Scope extends EventEmitter {
         }
     }
 
-    private updateMvpMatrix(): void {
-        this.mvp = getMvpMatrix(this.map);
-        this.needsRerender = true;
-    }
-
     private resetSize = (): void => {
         const { canvas, container } = this;
 
@@ -253,8 +242,6 @@ export class Scope extends EventEmitter {
         this.height = scaledHeight;
 
         this.picker.setSize(width, height);
-
-        this.updateMvpMatrix();
     };
 
     private showTooltip = (x: number, y: number): void => {
@@ -321,7 +308,7 @@ export class Scope extends EventEmitter {
         gl.viewport(0, 0, this.width, this.height);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        this.renderingProgram.bindUniform('mvp', ...this.mvp);
+        this.renderingProgram.bindUniform('mvp', ...getMvp(this.map));
 
         const maxValue = this.model.maxValues[this.row];
         const selectionMode = this.selectedColumns.size > 0;

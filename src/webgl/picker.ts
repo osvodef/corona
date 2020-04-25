@@ -5,7 +5,7 @@ import { RGBA } from '../types';
 import { Column } from './column';
 import { Program } from './program';
 import { Scope } from '../components/scope';
-import { debounce, lerpArrayValues, calcColumnHeight } from '../utils';
+import { debounce, lerpArrayValues, calcColumnHeight, getMvp } from '../utils';
 
 export class Picker {
     private gl: WebGLRenderingContext;
@@ -131,19 +131,17 @@ export class Picker {
     private render = (): void => {
         const { gl, scope, program, framebuffer } = this;
 
-        const mvp = scope.getMvp();
-
         gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
         program.use();
 
         gl.viewport(0, 0, this.width, this.height);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        program.bindUniform('mvp', ...mvp);
+        program.bindUniform('mvp', ...getMvp(this.map));
 
         for (const column of this.columns) {
-            const values = column.region.rows[this.scope.getRow()];
-            const value = lerpArrayValues(values, this.scope.getDay());
+            const values = column.region.rows[scope.getRow()];
+            const value = lerpArrayValues(values, scope.getDay());
 
             if (value === 0) {
                 continue;

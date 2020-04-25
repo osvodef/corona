@@ -1,37 +1,15 @@
 import { RGB, Palette, RGBA, RowName } from './types';
-import { worldSize, columnHeight, deathsPalette, dayOne, casesPalette } from './constants';
+import { columnHeight, deathsPalette, dayOne, casesPalette } from './constants';
 
 export const isMobile =
     typeof orientation !== 'undefined' || navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
 
+export function getMvp(map: any): number[] {
+    return map.painter.transform.customLayerMatrix();
+}
+
 export function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
-}
-
-export function degToRad(degrees: number): number {
-    return (degrees * Math.PI) / 180;
-}
-
-export function radToDeg(radians: number): number {
-    return (radians / Math.PI) * 180;
-}
-
-export function projectGeoToMap(geoPoint: number[]): number[] {
-    const sin = Math.sin(degToRad(geoPoint[1]));
-
-    const x = (geoPoint[0] * worldSize) / 360;
-    const y = (Math.log((1 + sin) / (1 - sin)) * worldSize) / (4 * Math.PI);
-
-    return [x, y, 0];
-}
-
-export function projectMapToGeo(mapPoint: number[]): number[] {
-    const latFactor = (-2 * Math.PI) / worldSize;
-
-    return [
-        (mapPoint[0] * 360) / worldSize,
-        90.0 - 2 * radToDeg(Math.atan(Math.exp(mapPoint[1] * latFactor))),
-    ];
 }
 
 export function formatNumber(x: number): string {

@@ -1,13 +1,5 @@
 import { LngLatBoundsLike } from 'mapbox-gl';
 
-export const worldSize = 2 ** 32;
-
-export const near = 100000;
-export const far = 2 ** 34;
-
-// Taken from Mapbox GL JS engine
-export const fov = 36.86989764584402;
-
 export const dayOne = new Date(2020, 0, 22);
 export const dateFormat = 'M/D/YY';
 
@@ -23,8 +15,8 @@ export const initialBounds: LngLatBoundsLike = [
 ];
 
 export const columnFaceCount = 4;
-export const columnHeight = 20000000;
-export const columnWidth = 8500000;
+export const columnHeight = 0.0047;
+export const columnWidth = 0.002;
 export const animationSpeed = 15;
 
 export const casesPalette = [

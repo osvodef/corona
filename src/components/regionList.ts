@@ -83,7 +83,7 @@ export class RegionList extends EventEmitter {
                     <div class="country-case-count">${formatNumber(caseCount)}</div>
                 </div>
             </div>
-    `;
+        `;
     }
 
     private getCountryMarkup(country: Country): string {
@@ -118,7 +118,7 @@ export class RegionList extends EventEmitter {
         return `
             <div class="country ${expanded}" data-id="${country.id}">
                 <div class="country-info" data-id="${country.id}">
-                    <div class="expand-button ${hidden} ">
+                    <div class="expand-button ${hidden}">
                         <img src="chevron.svg" class="icon expand" />
                         <img src="chevron-black.svg" class="icon expand-hover" />
                     </div>
