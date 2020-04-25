@@ -1,12 +1,11 @@
+import { Card } from './card';
 import mapbox from 'mapbox-gl';
 import { Scope } from './scope';
-import { calcDate, isNarrowScreen } from '../utils';
 import dateLib from 'date-and-time';
-import { Model, RowName, Region, Country, ModeName } from '../types';
 import { RegionList } from './regionList';
-import { Column } from '../webgl/column';
-import { Card } from './card';
 import { initialBounds } from '../constants';
+import { calcDate, isNarrowScreen } from '../utils';
+import { Model, RowName, Region, Country, ModeName } from '../types';
 
 export class App {
     private map: mapboxgl.Map;
@@ -69,11 +68,11 @@ export class App {
             pauseIcon.classList.add('hidden');
         });
 
-        scope.on('click', (column: Column | undefined) => {
-            if (column !== undefined) {
+        scope.on('click', (region: Region | undefined) => {
+            if (region !== undefined) {
                 this.setMode('card');
-                this.card.render(column.country, column.region);
-                scope.selectRegion(column.country.id, column.region.id);
+                this.card.render(region.country, region);
+                scope.selectRegion(region.country.id, region.id);
             } else {
                 this.setMode('map');
                 scope.deselect();

@@ -3,10 +3,11 @@ import fragmentShader from '../webgl/shaders/frag.glsl';
 
 import { Picker } from '../webgl/picker';
 import { Column } from '../webgl/column';
-import { Model, RowName } from '../types';
 import { Program } from '../webgl/program';
 import { animationSpeed } from '../constants';
 import { EventEmitter } from '../eventEmitter';
+import { MercatorCoordinate } from 'mapbox-gl';
+import { Model, RowName, Region } from '../types';
 import {
     clamp,
     lerpArrayValues,
@@ -39,7 +40,7 @@ export class Scope extends EventEmitter {
     private height: number;
 
     private model: Model;
-    private columns: Column[];
+    private column: Column;
 
     private day: number;
     private row: RowName;
@@ -100,16 +101,16 @@ export class Scope extends EventEmitter {
                 { name: 'mvp', type: '4m' },
                 { name: 'color', type: '4f' },
                 { name: 'height', type: '1f' },
+                { name: 'center', type: '2f' },
             ],
         );
 
         this.row = 'cases';
         this.day = this.model.dayCount - 1;
 
-        this.columns = [];
-        this.initColumns(model);
+        this.column = new Column(gl);
 
-        this.picker = new Picker(gl, this, map, this.columns);
+        this.picker = new Picker(gl, this, map, this.model, this.column);
 
         this.selectedColumns = new Set();
 
@@ -215,17 +216,6 @@ export class Scope extends EventEmitter {
         this.needsRerender = true;
     }
 
-    private initColumns(model: Model): void {
-        const { gl } = this;
-
-        let columnId = 0;
-        for (const country of model.countries) {
-            for (const region of country.regions) {
-                this.columns.push(new Column(gl, country, region, columnId++));
-            }
-        }
-    }
-
     private resetSize = (): void => {
         const { canvas, container } = this;
 
@@ -245,8 +235,8 @@ export class Scope extends EventEmitter {
     };
 
     private showTooltip = (x: number, y: number): void => {
-        const column = this.picker.pick(x, y);
-        if (column === undefined) {
+        const region = this.picker.pick(x, y);
+        if (region === undefined) {
             this.tooltip.style.display = 'none';
             return;
         }
@@ -254,7 +244,7 @@ export class Scope extends EventEmitter {
         this.tooltip.style.display = 'block';
         this.tooltip.style.transform = `translate(${x + 15}px, ${y + 15}px)`;
 
-        const { region, country } = column;
+        const { country } = region;
 
         const title = region.name !== '' ? region.name : country.name;
         const subtitle = region.name !== '' ? country.name : '';
@@ -301,7 +291,8 @@ export class Scope extends EventEmitter {
     }
 
     private render(): void {
-        const { gl, columns } = this;
+        const { gl, column } = this;
+        const { positionBuffer, normalBuffer } = column;
 
         this.renderingProgram.use();
 
@@ -309,52 +300,58 @@ export class Scope extends EventEmitter {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         this.renderingProgram.bindUniform('mvp', ...getMvp(this.map));
+        this.renderingProgram.bindAttribute('position', positionBuffer);
+        this.renderingProgram.bindAttribute('normal', normalBuffer);
 
         const maxValue = this.model.maxValues[this.row];
         const selectionMode = this.selectedColumns.size > 0;
 
-        for (const column of columns) {
-            const values = column.region.rows[this.row];
-            const value = lerpArrayValues(values, this.day);
+        for (const country of this.model.countries) {
+            for (const region of country.regions) {
+                const isSelected = this.selectedColumns.has(`${country.id}_${region.id}`);
 
-            if (value === 0) {
-                continue;
-            }
-
-            const isSelected = this.selectedColumns.has(column.key);
-            if (isSelected) {
-                this.renderingProgram.bindUniform(
-                    'color',
-                    ...calcColumnColor(this.row, value, maxValue, selectionMode, isSelected),
-                );
-                this.renderingProgram.bindAttribute('position', column.positionBuffer);
-                this.renderingProgram.bindAttribute('normal', column.normalBuffer);
-                this.renderingProgram.bindUniform('height', calcColumnHeight(value));
-
-                gl.drawArrays(gl.TRIANGLES, 0, column.vertexCount);
+                if (isSelected) {
+                    this.renderColumn(region, maxValue, selectionMode, isSelected);
+                }
             }
         }
 
-        for (const column of columns) {
-            const values = column.region.rows[this.row];
-            const value = lerpArrayValues(values, this.day);
+        for (const country of this.model.countries) {
+            for (const region of country.regions) {
+                const isSelected = this.selectedColumns.has(`${country.id}_${region.id}`);
 
-            if (value === 0) {
-                continue;
-            }
-
-            const isSelected = this.selectedColumns.has(column.key);
-            if (!isSelected) {
-                this.renderingProgram.bindUniform(
-                    'color',
-                    ...calcColumnColor(this.row, value, maxValue, selectionMode, isSelected),
-                );
-                this.renderingProgram.bindAttribute('position', column.positionBuffer);
-                this.renderingProgram.bindAttribute('normal', column.normalBuffer);
-                this.renderingProgram.bindUniform('height', calcColumnHeight(value));
-
-                gl.drawArrays(gl.TRIANGLES, 0, column.vertexCount);
+                if (!isSelected) {
+                    this.renderColumn(region, maxValue, selectionMode, isSelected);
+                }
             }
         }
+    }
+
+    private renderColumn(
+        region: Region,
+        maxValue: number,
+        selectionMode: boolean,
+        isSelected: boolean,
+    ): void {
+        const { gl, column } = this;
+        const { vertexCount } = column;
+
+        const values = region.rows[this.row];
+        const value = lerpArrayValues(values, this.day);
+
+        if (value === 0) {
+            return;
+        }
+
+        this.renderingProgram.bindUniform(
+            'color',
+            ...calcColumnColor(this.row, value, maxValue, selectionMode, isSelected),
+        );
+
+        const center = MercatorCoordinate.fromLngLat([region.lng, region.lat]);
+        this.renderingProgram.bindUniform('center', center.x, center.y);
+        this.renderingProgram.bindUniform('height', calcColumnHeight(value));
+
+        gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
     }
 }

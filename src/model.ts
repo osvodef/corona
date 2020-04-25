@@ -42,15 +42,17 @@ export function buildModel(casesCsv: string, deathsCsv: string): Model {
                 id,
                 name: countryName,
                 rows,
-                regions: regions.map((region, id) => {
-                    const regionName = region['Province/State'];
-                    const lng = Number(region['Long']);
-                    const lat = Number(region['Lat']);
-                    const rows = createEmptyRows(dayCount);
-                    rowsByRegion[`${countryName}$${regionName}`] = rows;
-                    return { id, name: regionName, lng, lat, rows };
-                }),
+                regions: [],
             };
+
+            country.regions = regions.map((region, id) => {
+                const regionName = region['Province/State'];
+                const lng = Number(region['Long']);
+                const lat = Number(region['Lat']);
+                const rows = createEmptyRows(dayCount);
+                rowsByRegion[`${countryName}$${regionName}`] = rows;
+                return { id, name: regionName, country, lng, lat, rows };
+            });
 
             return country;
         }),

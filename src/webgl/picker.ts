@@ -1,10 +1,11 @@
 import vertexShader from './shaders/pick.vert.glsl';
 import fragmentShader from './shaders/frag.glsl';
 
-import { RGBA } from '../types';
 import { Column } from './column';
 import { Program } from './program';
 import { Scope } from '../components/scope';
+import { MercatorCoordinate } from 'mapbox-gl';
+import { RGBA, Model, Region } from '../types';
 import { debounce, lerpArrayValues, calcColumnHeight, getMvp } from '../utils';
 
 export class Picker {
@@ -12,7 +13,8 @@ export class Picker {
     private framebuffer: WebGLFramebuffer;
     private renderbuffer: WebGLRenderbuffer;
 
-    private columns: Column[];
+    private column: Column;
+    private regions: Region[];
 
     private program: Program;
     private scope: Scope;
@@ -27,7 +29,13 @@ export class Picker {
 
     private debouncedRender: () => void;
 
-    constructor(gl: WebGLRenderingContext, scope: Scope, map: mapboxgl.Map, columns: Column[]) {
+    constructor(
+        gl: WebGLRenderingContext,
+        scope: Scope,
+        map: mapboxgl.Map,
+        model: Model,
+        column: Column,
+    ) {
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -63,6 +71,7 @@ export class Picker {
                 { name: 'mvp', type: '4m' },
                 { name: 'color', type: '4f' },
                 { name: 'height', type: '1f' },
+                { name: 'center', type: '2f' },
             ],
         );
 
@@ -78,7 +87,11 @@ export class Picker {
         this.framebuffer = framebuffer;
         this.renderbuffer = renderbuffer;
 
-        this.columns = columns;
+        this.column = column;
+
+        this.regions = model.countries.reduce<Region[]>((result, country) => {
+            return result.concat(country.regions);
+        }, []);
 
         this.map.on('mousemove', (e) => {
             const id = this.pick(e.point.x, e.point.y);
@@ -109,7 +122,7 @@ export class Picker {
         this.update();
     }
 
-    public pick(x: number, y: number): Column | undefined {
+    public pick(x: number, y: number): Region | undefined {
         const { pixels, valid, width, height } = this;
 
         if (!valid) {
@@ -119,7 +132,7 @@ export class Picker {
         const offset = ((height - y) * width + x) * 4;
         const id = this.colorToId(pixels[offset], pixels[offset + 1], pixels[offset + 2]);
 
-        return id !== undefined ? this.columns[id] : undefined;
+        return id !== undefined ? this.regions[id] : undefined;
     }
 
     public update(): void {
@@ -129,7 +142,8 @@ export class Picker {
     }
 
     private render = (): void => {
-        const { gl, scope, program, framebuffer } = this;
+        const { gl, scope, program, framebuffer, column } = this;
+        const { positionBuffer, vertexCount } = column;
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
         program.use();
@@ -138,20 +152,24 @@ export class Picker {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         program.bindUniform('mvp', ...getMvp(this.map));
+        program.bindAttribute('position', positionBuffer);
 
-        for (const column of this.columns) {
-            const values = column.region.rows[scope.getRow()];
+        for (let i = 0; i < this.regions.length; i++) {
+            const region = this.regions[i];
+            const values = region.rows[scope.getRow()];
             const value = lerpArrayValues(values, scope.getDay());
 
             if (value === 0) {
                 continue;
             }
 
-            program.bindAttribute('position', column.positionBuffer);
-            program.bindUniform('color', ...this.idToColor(column.id));
+            const center = MercatorCoordinate.fromLngLat([region.lng, region.lat]);
+
+            program.bindUniform('center', center.x, center.y);
+            program.bindUniform('color', ...this.idToColor(i));
             program.bindUniform('height', calcColumnHeight(value));
 
-            gl.drawArrays(gl.TRIANGLES, 0, column.vertexCount);
+            gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
         }
 
         gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, this.pixels);

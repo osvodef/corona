@@ -1,32 +1,19 @@
-import { Region, Country } from '../types';
-import { MercatorCoordinate } from 'mapbox-gl';
 import { columnFaceCount, columnWidth } from '../constants';
 
 export class Column {
     public positionBuffer: WebGLBuffer;
     public normalBuffer: WebGLBuffer;
     public vertexCount: number;
-    public country: Country;
-    public region: Region;
-    public key: string;
-    public id: number;
 
-    constructor(gl: WebGLRenderingContext, country: Country, region: Region, id: number) {
-        const { lat, lng } = region;
-
+    constructor(gl: WebGLRenderingContext) {
         this.positionBuffer = gl.createBuffer() as WebGLBuffer;
         this.normalBuffer = gl.createBuffer() as WebGLBuffer;
         this.vertexCount = columnFaceCount * 9;
 
-        this.id = id;
-        this.region = region;
-        this.country = country;
-        this.key = `${country.id}_${region.id}`;
-
-        this.fillBuffers(gl, MercatorCoordinate.fromLngLat([lng, lat]));
+        this.fillBuffers(gl);
     }
 
-    private fillBuffers(gl: WebGLRenderingContext, center: MercatorCoordinate): void {
+    private fillBuffers(gl: WebGLRenderingContext): void {
         const { positionBuffer, normalBuffer, vertexCount } = this;
 
         const positions = new Float32Array(vertexCount * 3);
@@ -39,15 +26,15 @@ export class Column {
             const wallAngleCos = Math.cos(wallAngle);
             const wallAngleSin = Math.sin(wallAngle);
 
-            const x1 = center.x + columnWidth * Math.cos(angleStep * i);
-            const y1 = center.y + columnWidth * Math.sin(angleStep * i);
+            const x1 = columnWidth * Math.cos(angleStep * i);
+            const y1 = columnWidth * Math.sin(angleStep * i);
 
-            const x2 = center.x + columnWidth * Math.cos(angleStep * (i + 1));
-            const y2 = center.y + columnWidth * Math.sin(angleStep * (i + 1));
+            const x2 = columnWidth * Math.cos(angleStep * (i + 1));
+            const y2 = columnWidth * Math.sin(angleStep * (i + 1));
 
             // Generating the top part:
-            positions[positionIndex++] = center.x;
-            positions[positionIndex++] = center.y;
+            positions[positionIndex++] = 0;
+            positions[positionIndex++] = 0;
             positions[positionIndex++] = 1;
             normals[normalIndex++] = 0;
             normals[normalIndex++] = 0;

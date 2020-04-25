@@ -21,6 +21,7 @@ export interface Country {
 
 export interface Region {
     id: number;
+    country: Country;
     name: string;
     lng: number;
     lat: number;
