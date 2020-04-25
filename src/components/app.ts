@@ -95,6 +95,17 @@ export class App {
             this.focusOnCountry(country);
         });
 
+        card.on('countryclick', (id: number | undefined) => {
+            if (id !== undefined) {
+                const country = this.model.countries[id];
+
+                this.setMode('card');
+                this.card.render(country);
+                scope.selectCountry(id);
+                this.focusOnCountry(country);
+            }
+        });
+
         regionList.on('regionclick', (countryId: number, regionId: number) => {
             const country = this.model.countries[countryId];
             const region = country.regions[regionId];

@@ -403,6 +403,7 @@ body {
     font-size: 18px;
     color: #aaa;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .chart {

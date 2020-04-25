@@ -39,6 +39,8 @@ export class Card extends EventEmitter {
 
     private dayCount: number;
 
+    private countryId?: number;
+
     private app: App;
     private model: Model;
 
@@ -66,6 +68,10 @@ export class Card extends EventEmitter {
             '.chart-counter.deaths .chart-counter-caption',
         ) as HTMLDivElement;
 
+        subheader.addEventListener('click', () => {
+            this.fire('countryclick', this.countryId);
+        });
+
         closeButton.addEventListener('click', () => {
             this.fire('close');
         });
@@ -92,6 +98,8 @@ export class Card extends EventEmitter {
     }
 
     public render(country: Country, region?: Region): void {
+        this.countryId = country.id;
+
         const title = region !== undefined && region.name !== '' ? region.name : country.name;
         const subtitle = region !== undefined && region.name !== '' ? country.name : '';
         const rows = region !== undefined ? region.rows : country.rows;
