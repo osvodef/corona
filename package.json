@@ -1,7 +1,7 @@
 {
   "name": "corona",
   "version": "1.0.0",
-  "description": "COVID-19 Tracker",
+  "description": "Interactive animated COVID-19 map",
   "main": "src/index.js",
   "scripts": {
     "start": "webpack-dev-server",
