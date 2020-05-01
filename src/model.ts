@@ -20,8 +20,10 @@ export function buildModel(casesCsv: string, deathsCsv: string): Model {
     const rowsByRegion: { [region: string]: Rows } = {};
 
     const maxValues = {
-        cases: 0,
-        deaths: 0,
+        casesTotal: 0,
+        deathsTotal: 0,
+        casesDaily: 0,
+        deathsDaily: 0,
     };
 
     const countries = Array.from(new Set(cases.map((record) => record['Country/Region'])));
@@ -69,29 +71,53 @@ export function buildModel(casesCsv: string, deathsCsv: string): Model {
         const countryRows = rowsByCountry[countryName];
         const worldRows = model.rows;
 
-        let dayIndex = 0;
-        for (const date of dates) {
+        for (let dayIndex = 0; dayIndex < dates.length; dayIndex++) {
+            const date = dates[dayIndex];
+            const prevDate = dates[dayIndex - 1];
+
             const cases = Number(casesRecord[date]);
             const deaths = Number(deathsRecord[date]);
 
-            if (cases > maxValues.cases) {
-                maxValues.cases = cases;
+            const casesDelta =
+                dayIndex !== 0
+                    ? Math.max(Number(casesRecord[date]) - Number(casesRecord[prevDate]), 0)
+                    : 0;
+
+            const deathsDelta =
+                dayIndex !== 0
+                    ? Math.max(Number(deathsRecord[date]) - Number(deathsRecord[prevDate]), 0)
+                    : 0;
+
+            if (cases > maxValues.casesTotal) {
+                maxValues.casesTotal = cases;
+            }
+            if (deaths > maxValues.deathsTotal) {
+                maxValues.deathsTotal = deaths;
+            }
+            if (casesDelta > maxValues.casesDaily) {
+                maxValues.casesDaily = casesDelta;
+            }
+            if (deathsDelta > maxValues.deathsDaily) {
+                maxValues.deathsDaily = deathsDelta;
             }
 
-            if (deaths > maxValues.deaths) {
-                maxValues.deaths = deaths;
-            }
+            regionRows.casesTotal[dayIndex] += cases;
+            regionRows.deathsTotal[dayIndex] += deaths;
 
-            regionRows.cases[dayIndex] += cases;
-            regionRows.deaths[dayIndex] += deaths;
+            countryRows.casesTotal[dayIndex] += cases;
+            countryRows.deathsTotal[dayIndex] += deaths;
 
-            countryRows.cases[dayIndex] += cases;
-            countryRows.deaths[dayIndex] += deaths;
+            worldRows.casesTotal[dayIndex] += cases;
+            worldRows.deathsTotal[dayIndex] += deaths;
 
-            worldRows.cases[dayIndex] += cases;
-            worldRows.deaths[dayIndex] += deaths;
+            regionRows.casesDaily[dayIndex] += casesDelta;
+            regionRows.deathsDaily[dayIndex] += deathsDelta;
 
-            dayIndex++;
+            countryRows.casesDaily[dayIndex] += casesDelta;
+            countryRows.deathsDaily[dayIndex] += deathsDelta;
+
+            worldRows.casesDaily[dayIndex] += casesDelta;
+            worldRows.deathsDaily[dayIndex] += deathsDelta;
         }
     }
 
@@ -100,8 +126,10 @@ export function buildModel(casesCsv: string, deathsCsv: string): Model {
 
 function createEmptyRows(dayCount: number): Rows {
     return {
-        cases: Array(dayCount).fill(0),
-        deaths: Array(dayCount).fill(0),
+        casesTotal: Array(dayCount).fill(0),
+        deathsTotal: Array(dayCount).fill(0),
+        casesDaily: Array(dayCount).fill(0),
+        deathsDaily: Array(dayCount).fill(0),
     };
 }
 

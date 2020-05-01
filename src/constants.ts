@@ -20,16 +20,17 @@ export const columnWidth = 0.002;
 export const animationSpeed = 15;
 
 export const casesPalette = [
-    '#ffffd9',
-    '#edf8b1',
-    '#c7e9b4',
-    '#7fcdbb',
-    '#41b6c4',
-    '#1d91c0',
-    '#225ea8',
-    '#253494',
-    '#081d58',
-].reverse();
+    '#000004',
+    '#36106b',
+    '#792282',
+    '#b3367a',
+    '#e34e65',
+    '#f9785d',
+    '#fea16e',
+    '#fec68a',
+    '#fde3a5',
+    '#fcfdbf',
+];
 
 export const deathsPalette = [
     '#fff5f0',

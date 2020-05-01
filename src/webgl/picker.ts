@@ -6,7 +6,7 @@ import { Program } from './program';
 import { Scope } from '../components/scope';
 import { MercatorCoordinate } from 'mapbox-gl';
 import { RGBA, Model, Region } from '../types';
-import { debounce, lerpArrayValues, calcColumnHeight, getMvp } from '../utils';
+import { debounce, lerpArrayValues, calcColumnHeight, getMvp, getCombinedRowName } from '../utils';
 
 export class Picker {
     private gl: WebGLRenderingContext;
@@ -156,7 +156,8 @@ export class Picker {
 
         for (let i = 0; i < this.regions.length; i++) {
             const region = this.regions[i];
-            const values = region.rows[scope.getRow()];
+            const combinedRowName = getCombinedRowName(scope.getRow(), scope.getDeltaMode());
+            const values = region.rows[combinedRowName];
             const value = lerpArrayValues(values, scope.getDay());
 
             if (value === 0) {

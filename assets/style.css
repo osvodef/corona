@@ -120,7 +120,7 @@ body {
     font-weight: bold;
 }
 .tooltip-counter.cases {
-    color: #2166ac;
+    color: #006837;
 }
 .tooltip-counter.deaths {
     margin-left: 15px;
@@ -244,13 +244,22 @@ body {
     height: 50px;
 }
 
-.countries.row-cases .country-case-count,
-.countries.row-cases .region-case-count {
-    color: #2166ac;
+.sidebar.row-cases .country-case-count,
+.sidebar.row-cases .region-case-count,
+.sidebar.row-cases .delta-switch.daily .delta-option[data-option='daily'],
+.sidebar.row-cases .delta-switch.total .delta-option[data-option='total'] {
+    color: #006837;
 }
-.countries.row-deaths .country-case-count,
-.countries.row-deaths .region-case-count {
+.sidebar.row-deaths .country-case-count,
+.sidebar.row-deaths .region-case-count,
+.sidebar.row-deaths .delta-switch.daily .delta-option[data-option='daily'],
+.sidebar.row-deaths .delta-switch.total .delta-option[data-option='total'] {
     color: #ca0020;
+}
+
+.delta-switch.daily .delta-option[data-option='daily'],
+.delta-switch.total .delta-option[data-option='total'] {
+    cursor: initial;
 }
 
 .country-info[data-id='world'] .country-name,
@@ -299,12 +308,12 @@ body {
     transform: rotate(180deg);
 }
 
-.countries.row-cases .country-info:hover,
-.countries.row-cases .region:hover {
+.sidebar.row-cases .country-info:hover,
+.sidebar.row-cases .region:hover {
     background-color: rgba(209, 229, 240, 0.25);
 }
-.countries.row-deaths .country-info:hover,
-.countries.row-deaths .region:hover {
+.sidebar.row-deaths .country-info:hover,
+.sidebar.row-deaths .region:hover {
     background-color: rgba(253, 219, 199, 0.25);
 }
 
@@ -349,19 +358,20 @@ body {
 }
 
 .row-selector-button[data-row='cases'] {
-    color: #2166ac;
+    color: #006837;
 }
 .row-selector-button[data-row='deaths'] {
     color: #b2182b;
 }
 
-.row-selector-button:not(:first-child) {
-    margin-left: -1px;
-}
-
-.row-selector-button.active {
+.sidebar.row-cases .row-selector-button[data-row='cases'],
+.sidebar.row-deaths .row-selector-button[data-row='deaths'] {
     background-color: #fff;
     cursor: initial;
+}
+
+.row-selector-button:not(:first-child) {
+    margin-left: -1px;
 }
 
 .card {
@@ -421,7 +431,7 @@ body {
 }
 
 .chart-counter.cases {
-    color: #2166ac;
+    color: #006837;
 }
 .chart-counter.deaths {
     color: #b2182b;
@@ -436,6 +446,42 @@ body {
 
 .chart-overlay {
     cursor: pointer;
+}
+
+.delta-switch {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #ddd;
+    height: 50px;
+    background-color: #eeeeee;
+}
+
+.delta-option {
+    height: 100%;
+    flex-grow: 1;
+    cursor: pointer;
+    line-height: 50px;
+    font-weight: bold;
+    color: #777;
+}
+
+.delta-option:first-child {
+    text-align: right;
+    padding-right: 20px;
+}
+
+.delta-option:last-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.icon.delta-toggle {
+    cursor: pointer;
+    height: 30px;
+}
+
+.delta-switch.daily .icon.delta-toggle {
+    transform: scaleX(-1);
 }
 
 .mode-selector {

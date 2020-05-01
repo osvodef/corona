@@ -5,22 +5,23 @@ import dateLib from 'date-and-time';
 import { RegionList } from './regionList';
 import { initialBounds } from '../constants';
 import { calcDate, isNarrowScreen } from '../utils';
-import { Model, RowName, Region, Country, ModeName } from '../types';
+import { Model, RowName, Region, Country, ModeName, DeltaMode } from '../types';
 
 export class App {
     private map: mapboxgl.Map;
     private model: Model;
 
     private sidebar: HTMLDivElement;
+    private deltaSwitch: HTMLDivElement;
 
     private regionList: RegionList;
     private scope: Scope;
     private card: Card;
 
-    private rowSelectorButtons: NodeListOf<HTMLDivElement>;
     private modeSelectorButtons: NodeListOf<HTMLDivElement>;
 
     private day: number;
+    private deltaMode: DeltaMode;
 
     constructor(container: HTMLElement, map: mapboxgl.Map, model: Model) {
         this.map = map;
@@ -28,6 +29,7 @@ export class App {
 
         const tooltip = container.querySelector('.tooltip') as HTMLDivElement;
         const sidebar = container.querySelector('.sidebar') as HTMLDivElement;
+        const deltaSwitch = container.querySelector('.delta-switch') as HTMLDivElement;
         const cardElement = container.querySelector('.card') as HTMLDivElement;
         const scopeElement = container.querySelector('.scope') as HTMLDivElement;
         const regionListElement = container.querySelector('.countries') as HTMLDivElement;
@@ -42,6 +44,10 @@ export class App {
         const modeSelectorButtons = container.querySelectorAll(
             '.mode-selector-button',
         ) as NodeListOf<HTMLDivElement>;
+        const deltaButtons = container.querySelectorAll('.delta-option') as NodeListOf<
+            HTMLDivElement
+        >;
+        const deltaToggle = container.querySelector('.delta-toggle') as HTMLDivElement;
 
         const regionList = new RegionList(regionListElement, model);
         const scope = new Scope(scopeElement, tooltip, map, model);
@@ -135,6 +141,16 @@ export class App {
             });
         });
 
+        deltaButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                this.setDeltaMode(button.dataset.option as DeltaMode);
+            });
+        });
+
+        deltaToggle.addEventListener('click', () => {
+            this.setDeltaMode(this.deltaMode === 'daily' ? 'total' : 'daily');
+        });
+
         modeSelectorButtons.forEach((button) => {
             button.addEventListener('click', () => {
                 this.setMode(button.dataset.mode as ModeName);
@@ -157,14 +173,15 @@ export class App {
         });
 
         this.day = this.model.dayCount - 1;
+        this.deltaMode = 'daily';
 
         this.scope = scope;
         this.regionList = regionList;
         this.sidebar = sidebar;
         this.card = card;
 
-        this.rowSelectorButtons = rowSelectorButtons;
         this.modeSelectorButtons = modeSelectorButtons;
+        this.deltaSwitch = deltaSwitch;
     }
 
     public getDay(): number {
@@ -199,15 +216,21 @@ export class App {
         this.scope.setRow(row);
         this.regionList.setRow(row);
 
-        this.rowSelectorButtons.forEach((button) => {
-            const buttonRow = button.dataset.row as RowName;
+        this.sidebar.classList.remove('row-cases');
+        this.sidebar.classList.remove('row-deaths');
+        this.sidebar.classList.add(`row-${row}`);
+    }
 
-            if (row === buttonRow) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
+    private setDeltaMode(mode: DeltaMode): void {
+        this.deltaMode = mode;
+
+        this.scope.setDeltaMode(mode);
+        this.regionList.setDeltaMode(mode);
+        this.card.setDeltaMode(mode);
+
+        this.deltaSwitch.classList.remove('daily');
+        this.deltaSwitch.classList.remove('total');
+        this.deltaSwitch.classList.add(mode);
     }
 
     private focusOnRegion(region: Region): void {

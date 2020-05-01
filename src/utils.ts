@@ -1,4 +1,4 @@
-import { RGB, Palette, RGBA, RowName } from './types';
+import { RGB, Palette, RGBA, RowName, DeltaMode, CombinedRowName } from './types';
 import { columnHeight, deathsPalette, dayOne, casesPalette } from './constants';
 
 export const isMobile =
@@ -12,8 +12,9 @@ export function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
 }
 
-export function formatNumber(x: number): string {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+export function formatNumber(x: number, deltaMode: DeltaMode): string {
+    const deltaSign = deltaMode === 'daily' ? '+' : '';
+    return deltaSign + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
 export function isNarrowScreen(): boolean {
@@ -26,6 +27,22 @@ function lerpColors(color1: RGB, color2: RGB, ratio: number): RGB {
         Math.round(color1[1] * (1 - ratio) + color2[1] * ratio),
         Math.round(color1[2] * (1 - ratio) + color2[2] * ratio),
     ];
+}
+
+export function getCombinedRowName(row: RowName, delta: DeltaMode): CombinedRowName {
+    if (row === 'cases' && delta === 'daily') {
+        return 'casesDaily';
+    }
+
+    if (row === 'cases' && delta === 'total') {
+        return 'casesTotal';
+    }
+
+    if (row === 'deaths' && delta === 'daily') {
+        return 'deathsDaily';
+    }
+
+    return 'deathsTotal';
 }
 
 export function lerpArrayValues(array: number[], fractionalIndex: number): number {

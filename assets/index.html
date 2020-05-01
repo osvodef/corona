@@ -62,8 +62,8 @@
                 <div class="map"></div>
                 <div class="scope"></div>
                 <div class="tooltip">
-                    <div class="tooltip-header">Hubei</div>
-                    <div class="tooltip-subheader">China</div>
+                    <div class="tooltip-header"></div>
+                    <div class="tooltip-subheader"></div>
                     <div class="tooltip-counters">
                         <div class="tooltip-counter cases"></div>
                         <div class="tooltip-counter deaths"></div>
@@ -71,13 +71,13 @@
                 </div>
             </div>
 
-            <div class="sidebar mode-map">
+            <div class="sidebar row-cases mode-map">
                 <div class="region-list">
                     <div class="row-selector">
-                        <div class="row-selector-button active" data-row="cases">Cases</div>
+                        <div class="row-selector-button" data-row="cases">Cases</div>
                         <div class="row-selector-button" data-row="deaths">Deaths</div>
                     </div>
-                    <div class="countries row-cases"></div>
+                    <div class="countries"></div>
                 </div>
                 <div class="card">
                     <div class="close-button">
@@ -96,6 +96,11 @@
                         </div>
                     </div>
                     <div class="chart"></div>
+                </div>
+                <div class="delta-switch daily">
+                    <div class="delta-option" data-option="daily">Daily values</div>
+                    <img src="toggle.svg" class="icon delta-toggle" />
+                    <div class="delta-option" data-option="total">Total values</div>
                 </div>
             </div>
             <div class="mode-selector">

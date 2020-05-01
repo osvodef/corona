@@ -7,7 +7,7 @@ import { Program } from '../webgl/program';
 import { animationSpeed } from '../constants';
 import { EventEmitter } from '../eventEmitter';
 import { MercatorCoordinate } from 'mapbox-gl';
-import { Model, RowName, Region } from '../types';
+import { Model, RowName, Region, DeltaMode } from '../types';
 import {
     clamp,
     lerpArrayValues,
@@ -17,6 +17,7 @@ import {
     isMobile,
     formatNumber,
     getMvp,
+    getCombinedRowName,
 } from '../utils';
 
 export class Scope extends EventEmitter {
@@ -44,6 +45,7 @@ export class Scope extends EventEmitter {
 
     private day: number;
     private row: RowName;
+    private deltaMode: DeltaMode;
 
     private animationStartTime: number | undefined;
     private animationStartDayIndex: number | undefined;
@@ -106,6 +108,7 @@ export class Scope extends EventEmitter {
         );
 
         this.row = 'cases';
+        this.deltaMode = 'daily';
         this.day = this.model.dayCount - 1;
 
         this.column = new Column(gl);
@@ -155,8 +158,18 @@ export class Scope extends EventEmitter {
         this.fire('rowchange');
     }
 
+    public setDeltaMode(mode: DeltaMode): void {
+        this.deltaMode = mode;
+        this.needsRerender = true;
+        this.fire('deltachange');
+    }
+
     public getRow(): RowName {
         return this.row;
+    }
+
+    public getDeltaMode(): DeltaMode {
+        return this.deltaMode;
     }
 
     public setDay(index: number): void {
@@ -253,8 +266,16 @@ export class Scope extends EventEmitter {
 
         this.tooltipHeader.innerText = title;
         this.tooltipSubheader.innerText = subtitle;
-        this.tooltipCaseCount.innerText = formatNumber(region.rows['cases'][dayIndex]);
-        this.tooltipDeathsCount.innerText = formatNumber(region.rows['deaths'][dayIndex]);
+
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+        this.tooltipCaseCount.innerText = formatNumber(
+            region.rows[combinedRowName][dayIndex],
+            this.deltaMode,
+        );
+        this.tooltipDeathsCount.innerText = formatNumber(
+            region.rows[combinedRowName][dayIndex],
+            this.deltaMode,
+        );
     };
 
     private renderLoop = (): void => {
@@ -303,7 +324,9 @@ export class Scope extends EventEmitter {
         this.renderingProgram.bindAttribute('position', positionBuffer);
         this.renderingProgram.bindAttribute('normal', normalBuffer);
 
-        const maxValue = this.model.maxValues[this.row];
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+
+        const maxValue = this.model.maxValues[combinedRowName];
         const selectionMode = this.selectedColumns.size > 0;
 
         for (const country of this.model.countries) {
@@ -336,7 +359,9 @@ export class Scope extends EventEmitter {
         const { gl, column } = this;
         const { vertexCount } = column;
 
-        const values = region.rows[this.row];
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+
+        const values = region.rows[combinedRowName];
         const value = lerpArrayValues(values, this.day);
 
         if (value === 0) {

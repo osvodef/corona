@@ -1,5 +1,5 @@
-import { Model, RowName, Country, Region } from '../types';
-import { throttle, clamp, formatNumber } from '../utils';
+import { Model, RowName, Country, Region, DeltaMode } from '../types';
+import { throttle, clamp, formatNumber, getCombinedRowName } from '../utils';
 import { EventEmitter } from '../eventEmitter';
 
 export class RegionList extends EventEmitter {
@@ -7,6 +7,7 @@ export class RegionList extends EventEmitter {
     private container: HTMLDivElement;
 
     private row: RowName;
+    private deltaMode: DeltaMode;
     private day: number;
 
     private expandedCountries: Set<number>;
@@ -32,6 +33,7 @@ export class RegionList extends EventEmitter {
         this.throttledRerender = throttle(this.rerender, 500);
 
         this.row = 'cases';
+        this.deltaMode = 'daily';
         this.day = model.dayCount - 1;
 
         this.rerender();
@@ -45,10 +47,11 @@ export class RegionList extends EventEmitter {
 
     public setRow(row: RowName): void {
         this.row = row;
-        this.container.classList.remove('row-cases');
-        this.container.classList.remove('row-deaths');
-        this.container.classList.add(`row-${row}`);
+        this.throttledRerender();
+    }
 
+    public setDeltaMode(mode: DeltaMode): void {
+        this.deltaMode = mode;
         this.throttledRerender();
     }
 
@@ -57,10 +60,12 @@ export class RegionList extends EventEmitter {
 
         html += this.getWorldMarkup();
 
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+
         const day = Math.floor(this.day);
         const countries = this.model.countries
             .slice()
-            .sort((a, b) => b.rows[this.row][day] - a.rows[this.row][day]);
+            .sort((a, b) => b.rows[combinedRowName][day] - a.rows[combinedRowName][day]);
 
         for (const country of countries) {
             html += this.getCountryMarkup(country);
@@ -73,14 +78,15 @@ export class RegionList extends EventEmitter {
 
     private getWorldMarkup(): string {
         const day = Math.floor(this.day);
-        const caseCount = this.model.rows[this.row][day];
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+        const caseCount = this.model.rows[combinedRowName][day];
 
         return `
             <div class="country" data-id="world">
                 <div class="country-info" data-id="world">
                     <div class="expand-button hidden"></div>
                     <div class="country-name">World</div>
-                    <div class="country-case-count">${formatNumber(caseCount)}</div>
+                    <div class="country-case-count">${formatNumber(caseCount, this.deltaMode)}</div>
                 </div>
             </div>
         `;
@@ -88,7 +94,8 @@ export class RegionList extends EventEmitter {
 
     private getCountryMarkup(country: Country): string {
         const day = Math.floor(this.day);
-        const caseCount = country.rows[this.row][day];
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+        const caseCount = country.rows[combinedRowName][day];
         const isExpanded = this.expandedCountries.has(country.id);
         const hasRegions = country.regions.length > 1;
 
@@ -101,7 +108,7 @@ export class RegionList extends EventEmitter {
         if (hasRegions) {
             const regions = country.regions
                 .slice()
-                .sort((a, b) => b.rows[this.row][day] - a.rows[this.row][day]);
+                .sort((a, b) => b.rows[combinedRowName][day] - a.rows[combinedRowName][day]);
 
             for (const region of regions) {
                 regionsMarkup += this.getRegionMarkup(country, region);
@@ -124,7 +131,7 @@ export class RegionList extends EventEmitter {
                     </div>
 
                     <div class="country-name">${country.name}</div>
-                    <div class="country-case-count">${formatNumber(caseCount)}</div>
+                    <div class="country-case-count">${formatNumber(caseCount, this.deltaMode)}</div>
                 </div>
                 ${regionsMarkup}
             </div>
@@ -132,7 +139,8 @@ export class RegionList extends EventEmitter {
     }
 
     private getRegionMarkup(country: Country, region: Region): string {
-        const caseCount = region.rows[this.row][Math.floor(this.day)];
+        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+        const caseCount = region.rows[combinedRowName][Math.floor(this.day)];
 
         if (caseCount === 0) {
             return '';
@@ -141,7 +149,7 @@ export class RegionList extends EventEmitter {
         return `
             <div class="region" data-country="${country.id}" data-region="${region.id}">
                 <div class="region-name">${region.name || country.name}</div>
-                <div class="region-case-count">${formatNumber(caseCount)}</div>
+                <div class="region-case-count">${formatNumber(caseCount, this.deltaMode)}</div>
             </div>
         `;
     }

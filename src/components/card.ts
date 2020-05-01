@@ -1,5 +1,5 @@
-import { Country, Region, Rows, Model } from '../types';
-import { calcDate, formatNumber } from '../utils';
+import { Country, Region, Rows, Model, DeltaMode } from '../types';
+import { calcDate, formatNumber, getCombinedRowName } from '../utils';
 import { EventEmitter } from '../eventEmitter';
 import dateLib from 'date-and-time';
 import { App } from './app';
@@ -37,9 +37,12 @@ export class Card extends EventEmitter {
     private day: number;
     private rows: Rows;
 
+    private deltaMode: DeltaMode;
+
     private dayCount: number;
 
-    private countryId?: number;
+    private country?: Country;
+    private region?: Region;
 
     private app: App;
     private model: Model;
@@ -69,7 +72,7 @@ export class Card extends EventEmitter {
         ) as HTMLDivElement;
 
         subheader.addEventListener('click', () => {
-            this.fire('countryclick', this.countryId);
+            this.fire('countryclick', this.country?.id);
         });
 
         closeButton.addEventListener('click', () => {
@@ -86,6 +89,7 @@ export class Card extends EventEmitter {
 
         this.day = this.model.dayCount - 1;
         this.rows = model.rows;
+        this.deltaMode = 'daily';
 
         this.casesCount = casesCount;
         this.deathsCount = deathsCount;
@@ -98,7 +102,8 @@ export class Card extends EventEmitter {
     }
 
     public render(country: Country, region?: Region): void {
-        this.countryId = country.id;
+        this.country = country;
+        this.region = region;
 
         const title = region !== undefined && region.name !== '' ? region.name : country.name;
         const subtitle = region !== undefined && region.name !== '' ? country.name : '';
@@ -114,6 +119,9 @@ export class Card extends EventEmitter {
     }
 
     public renderWorld(): void {
+        this.country = undefined;
+        this.region = undefined;
+
         this.header.innerText = 'World';
         this.subheader.innerText = '';
         this.chart.innerHTML = this.getChartMarkup(this.model.rows);
@@ -124,11 +132,14 @@ export class Card extends EventEmitter {
     }
 
     public setDay(day: number): void {
-        const cases = this.rows.cases[Math.floor(day)];
-        const deaths = this.rows.deaths[Math.floor(day)];
+        const casesRowName = getCombinedRowName('cases', this.deltaMode);
+        const deathsRowName = getCombinedRowName('deaths', this.deltaMode);
 
-        this.casesCount.innerText = formatNumber(cases);
-        this.deathsCount.innerText = formatNumber(deaths);
+        const cases = this.rows[casesRowName][Math.floor(day)];
+        const deaths = this.rows[deathsRowName][Math.floor(day)];
+
+        this.casesCount.innerText = formatNumber(cases, this.deltaMode);
+        this.deathsCount.innerText = formatNumber(deaths, this.deltaMode);
 
         this.casesCaption.innerText = cases === 1 ? 'case' : 'cases';
         this.deathsCaption.innerText = deaths === 1 ? 'death' : 'deaths';
@@ -144,14 +155,27 @@ export class Card extends EventEmitter {
         this.day = day;
     }
 
+    public setDeltaMode(mode: DeltaMode): void {
+        this.deltaMode = mode;
+
+        if (this.country !== undefined) {
+            this.render(this.country, this.region);
+        } else {
+            this.renderWorld();
+        }
+    }
+
     private getChartMarkup(rows: Rows): string {
-        const maxValue = Math.max(...rows.cases, ...rows.deaths);
+        const casesRowName = getCombinedRowName('cases', this.deltaMode);
+        const deathsRowName = getCombinedRowName('deaths', this.deltaMode);
+
+        const maxValue = Math.max(...rows[casesRowName], ...rows[deathsRowName]);
         const heightMultiplier = (chartBottom - chartTop) / maxValue;
 
         let offset = 0;
         while (
-            rows.cases[offset] * heightMultiplier < 1 &&
-            rows.deaths[offset] * heightMultiplier < 1
+            rows[casesRowName][offset] * heightMultiplier < 1 &&
+            rows[deathsRowName][offset] * heightMultiplier < 1
         ) {
             offset++;
         }
@@ -166,20 +190,20 @@ export class Card extends EventEmitter {
 
         // Main rectangles
         for (let i = 0; i < dayCount; i++) {
-            const casesHeight = rows.cases[offset + i] * heightMultiplier;
-            const deathsHeight = rows.deaths[offset + i] * heightMultiplier;
+            const casesHeight = rows[casesRowName][offset + i] * heightMultiplier;
+            const deathsHeight = rows[deathsRowName][offset + i] * heightMultiplier;
             const activeHeight = casesHeight - deathsHeight;
 
             const x = chartLeft + barWidth * i;
 
             if (deathsHeight > 0) {
                 const y = chartBottom - deathsHeight;
-                svg += this.rect(x, y, barWidth, deathsHeight, '#b2182b');
+                svg += this.rect(x, y, barWidth, deathsHeight, '#a50026');
             }
 
             if (activeHeight > 0) {
                 const y = chartBottom - deathsHeight - activeHeight;
-                svg += this.rect(x, y, barWidth, activeHeight, '#4393c3');
+                svg += this.rect(x, y, barWidth, activeHeight, '#1a9850');
             }
         }
 
