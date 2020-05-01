@@ -267,13 +267,14 @@ export class Scope extends EventEmitter {
         this.tooltipHeader.innerText = title;
         this.tooltipSubheader.innerText = subtitle;
 
-        const combinedRowName = getCombinedRowName(this.row, this.deltaMode);
+        const casesRowName = getCombinedRowName('cases', this.deltaMode);
+        const deathsRowName = getCombinedRowName('deaths', this.deltaMode);
         this.tooltipCaseCount.innerText = formatNumber(
-            region.rows[combinedRowName][dayIndex],
+            region.rows[casesRowName][dayIndex],
             this.deltaMode,
         );
         this.tooltipDeathsCount.innerText = formatNumber(
-            region.rows[combinedRowName][dayIndex],
+            region.rows[deathsRowName][dayIndex],
             this.deltaMode,
         );
     };
