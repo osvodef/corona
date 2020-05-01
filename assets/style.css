@@ -245,20 +245,17 @@ body {
 }
 
 .sidebar.row-cases .country-case-count,
-.sidebar.row-cases .region-case-count,
-.sidebar.row-cases .delta-switch.daily .delta-option[data-option='daily'],
-.sidebar.row-cases .delta-switch.total .delta-option[data-option='total'] {
+.sidebar.row-cases .region-case-count {
     color: #006837;
 }
 .sidebar.row-deaths .country-case-count,
-.sidebar.row-deaths .region-case-count,
-.sidebar.row-deaths .delta-switch.daily .delta-option[data-option='daily'],
-.sidebar.row-deaths .delta-switch.total .delta-option[data-option='total'] {
+.sidebar.row-deaths .region-case-count {
     color: #ca0020;
 }
 
 .delta-switch.daily .delta-option[data-option='daily'],
 .delta-switch.total .delta-option[data-option='total'] {
+    color: #111;
     cursor: initial;
 }
 
@@ -381,7 +378,6 @@ body {
     width: 100%;
     height: 100%;
     background-color: #fff;
-    border-bottom-right-radius: 3px;
     overflow: auto;
 }
 
@@ -456,13 +452,17 @@ body {
     background-color: #eeeeee;
 }
 
+.sidebar.mode-card .delta-switch {
+    border-bottom-right-radius: 3px;
+}
+
 .delta-option {
     height: 100%;
     flex-grow: 1;
     cursor: pointer;
     line-height: 50px;
     font-weight: bold;
-    color: #777;
+    color: #aaa;
 }
 
 .delta-option:first-child {
@@ -513,7 +513,7 @@ body {
         display: none;
     }
 
-    .card {
+    .delta-switch {
         border-radius: 0;
     }
 
