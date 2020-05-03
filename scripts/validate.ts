@@ -1,6 +1,9 @@
+import { getDayCount, getDateList, equalArrays } from './utils';
 import * as stringify from 'csv-stringify/lib/sync';
+import { russiaPoints } from './russiaPoints';
 import * as parse from 'csv-parse/lib/sync';
 import { dayOne } from '../src/constants';
+import { RussiaData } from './types';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -15,12 +18,15 @@ type ParsedCsv = Record[];
 
 const casesText = fs.readFileSync(path.join(dataPath, 'cases.csv'), 'utf8');
 const deathsText = fs.readFileSync(path.join(dataPath, 'deaths.csv'), 'utf8');
+const russiaText = fs.readFileSync(path.join(dataPath, 'russia.json'), 'utf8');
 
 const casesHeaders = parse(casesText)[0] as string[];
 const deathsHeaders = parse(deathsText)[0] as string[];
 
 const cases = parse(casesText, { columns: true }) as ParsedCsv;
 const deaths = parse(deathsText, { columns: true }) as ParsedCsv;
+
+const russia: RussiaData = JSON.parse(russiaText);
 
 if (getDayCount(casesHeaders) !== getDayCount(deathsHeaders)) {
     throw new Error("Day counts for cases and deaths don't match");
@@ -113,43 +119,46 @@ for (let i = 0; i < cases.length; i++) {
     }
 }
 
-fs.writeFileSync(path.join(dataPath, 'cases.csv'), stringify(cases, { header: true }));
-fs.writeFileSync(path.join(dataPath, 'deaths.csv'), stringify(deaths, { header: true }));
-
-function getDayCount(headers: string[]): number {
-    return headers.filter((header) => isDate(header)).length;
+if (russia.startDate !== '03/02/2020') {
+    throw new Error('Unexpected start date for Russian data');
 }
 
-function getDateList(dayOne: Date, dayCount: number): string[] {
-    const strings: string[] = [];
-    const date = new Date(dayOne);
+const russiaDayCount = russia.data[0].confirmed.length;
+const expectedDayCount = dayCount - 40;
 
-    for (let i = 0; i < dayCount; i++) {
-        strings.push(format(date));
-        date.setDate(date.getDate() + 1);
-    }
-
-    return strings;
+if (russiaDayCount < expectedDayCount) {
+    throw new Error(
+        `Not enough days in Russian data. Expected at least ${expectedDayCount}, got ${russiaDayCount}`,
+    );
 }
 
-function equalArrays(arr1: string[], arr2: string[]): boolean {
-    if (arr1.length !== arr2.length) {
-        return false;
+for (const record of russia.data) {
+    const { name, confirmed, dead } = record;
+
+    if (russiaPoints[name] === undefined) {
+        throw new Error(`Unexpected Russian region name: ${name}`);
     }
 
-    for (let i = 0; i < arr1.length; i++) {
-        if (arr1[i] !== arr2[i]) {
-            return false;
+    if (confirmed.length !== russiaDayCount) {
+        throw new Error(`Unexpected day count in cases array. Region: ${name}`);
+    }
+
+    if (dead.length !== russiaDayCount) {
+        throw new Error(`Unexpected day count in deaths array. Region: ${name}`);
+    }
+
+    for (const value of confirmed) {
+        if (Number.isNaN(value) || value < 0) {
+            throw new Error(`Invalid confirmed value. Region: ${name}`);
         }
     }
 
-    return true;
+    for (const value of dead) {
+        if (Number.isNaN(value) || value < 0) {
+            throw new Error(`Invalid deaths value. Region: ${name}`);
+        }
+    }
 }
 
-function isDate(key: string): boolean {
-    return /^\d{1,2}\/\d{1,2}\/\d{2}$/g.test(key);
-}
-
-function format(date: Date): string {
-    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear() % 100}`;
-}
+fs.writeFileSync(path.join(dataPath, 'cases.csv'), stringify(cases, { header: true }));
+fs.writeFileSync(path.join(dataPath, 'deaths.csv'), stringify(deaths, { header: true }));

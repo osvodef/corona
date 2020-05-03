@@ -12,8 +12,10 @@
     "minify": "npm run minify:html && npm run minify:css",
     "minify:html": "html-minifier -c html-minifier.json -o dist/index.html dist/index.html",
     "minify:css": "csso dist/style.css --output dist/style.css",
-    "data:update": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/update",
-    "data:validate": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/validate"
+    "data:download": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/download",
+    "data:validate": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/validate",
+    "data:merge": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/merge",
+    "data": "npm run data:download && npm run data:validate && npm run data:merge"
   },
   "keywords": [],
   "author": "",
