@@ -1,5 +1,5 @@
 import { RGB, Palette, RGBA, RowName, DeltaMode, CombinedRowName } from './types';
-import { columnHeight, deathsPalette, dayOne, casesPalette } from './constants';
+import { columnHeightTotal, dayOne, palette, columnHeightDelta } from './constants';
 
 export const isMobile =
     typeof orientation !== 'undefined' || navigator.userAgent.toLowerCase().indexOf('mobile') >= 0;
@@ -58,12 +58,13 @@ export function calcDate(day: number): Date {
     return new Date(dayOne.getFullYear(), dayOne.getMonth(), dayOne.getDate() + Math.floor(day));
 }
 
-export function calcColumnHeight(value: number): number {
+export function calcColumnHeight(value: number, deltaMode: DeltaMode): number {
+    const columnHeight = deltaMode === 'total' ? columnHeightTotal : columnHeightDelta;
+
     return Math.max(Math.log(value), 0) * columnHeight;
 }
 
 export function calcColumnColor(
-    row: RowName,
     value: number,
     maxValue: number,
     selectionMode: boolean,
@@ -72,10 +73,7 @@ export function calcColumnColor(
     const numerator = Math.max(Math.log(value), 0);
     const denominator = Math.max(Math.log(maxValue), 0);
 
-    const rgb = getColorFromPalette(
-        row === 'cases' ? casesPalette : deathsPalette,
-        numerator / denominator,
-    );
+    const rgb = getColorFromPalette(palette, numerator / denominator);
 
     let opacity: number;
 

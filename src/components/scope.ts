@@ -371,12 +371,12 @@ export class Scope extends EventEmitter {
 
         this.renderingProgram.bindUniform(
             'color',
-            ...calcColumnColor(this.row, value, maxValue, selectionMode, isSelected),
+            ...calcColumnColor(value, maxValue, selectionMode, isSelected),
         );
 
         const center = MercatorCoordinate.fromLngLat([region.lng, region.lat]);
         this.renderingProgram.bindUniform('center', center.x, center.y);
-        this.renderingProgram.bindUniform('height', calcColumnHeight(value));
+        this.renderingProgram.bindUniform('height', calcColumnHeight(value, this.deltaMode));
 
         gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
     }

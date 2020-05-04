@@ -15,11 +15,13 @@ export const initialBounds: LngLatBoundsLike = [
 ];
 
 export const columnFaceCount = 4;
-export const columnHeight = 0.0047;
-export const columnWidth = 0.002;
+export const columnHeightTotal = 0.003;
+export const columnHeightDelta = 0.005;
+export const columnWidth = 0.0015;
+export const columnRotation = (30 / 180) * Math.PI;
 export const animationSpeed = 15;
 
-export const casesPalette = [
+export const palette = [
     '#000004',
     '#36106b',
     '#792282',
@@ -31,15 +33,3 @@ export const casesPalette = [
     '#fde3a5',
     '#fcfdbf',
 ];
-
-export const deathsPalette = [
-    '#fff5f0',
-    '#fee0d2',
-    '#fcbba1',
-    '#fc9272',
-    '#fb6a4a',
-    '#ef3b2c',
-    '#cb181d',
-    '#a50f15',
-    '#67000d',
-].reverse();

@@ -168,7 +168,7 @@ export class Picker {
 
             program.bindUniform('center', center.x, center.y);
             program.bindUniform('color', ...this.idToColor(i));
-            program.bindUniform('height', calcColumnHeight(value));
+            program.bindUniform('height', calcColumnHeight(value, scope.getDeltaMode()));
 
             gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
         }

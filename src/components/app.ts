@@ -12,7 +12,8 @@ export class App {
     private model: Model;
 
     private sidebar: HTMLDivElement;
-    private deltaSwitch: HTMLDivElement;
+    private deltaToggle: HTMLDivElement;
+    private rowToggle: HTMLDivElement;
 
     private regionList: RegionList;
     private scope: Scope;
@@ -21,6 +22,7 @@ export class App {
     private modeSelectorButtons: NodeListOf<HTMLDivElement>;
 
     private day: number;
+    private row: RowName;
     private deltaMode: DeltaMode;
 
     constructor(container: HTMLElement, map: mapboxgl.Map, model: Model) {
@@ -38,16 +40,11 @@ export class App {
         const pauseIcon = playButton.querySelector('.icon.pause') as HTMLImageElement;
         const dateSlider = container.querySelector('.date-slider') as HTMLInputElement;
         const dateIndicator = container.querySelector('.date-indicator') as HTMLDivElement;
-        const rowSelectorButtons = container.querySelectorAll('.row-selector-button') as NodeListOf<
-            HTMLDivElement
-        >;
         const modeSelectorButtons = container.querySelectorAll(
             '.mode-selector-button',
         ) as NodeListOf<HTMLDivElement>;
-        const deltaButtons = container.querySelectorAll('.delta-option') as NodeListOf<
-            HTMLDivElement
-        >;
-        const deltaToggle = container.querySelector('.delta-toggle') as HTMLDivElement;
+        const rowToggle = container.querySelector('.row-selector') as HTMLDivElement;
+        const deltaToggle = container.querySelector('.delta-switch') as HTMLDivElement;
 
         const regionList = new RegionList(regionListElement, model);
         const scope = new Scope(scopeElement, tooltip, map, model);
@@ -135,16 +132,8 @@ export class App {
             }
         });
 
-        rowSelectorButtons.forEach((button) => {
-            button.addEventListener('click', () => {
-                this.setRow(button.dataset.row as RowName);
-            });
-        });
-
-        deltaButtons.forEach((button) => {
-            button.addEventListener('click', () => {
-                this.setDeltaMode(button.dataset.option as DeltaMode);
-            });
+        rowToggle.addEventListener('click', () => {
+            this.setRow(this.row === 'cases' ? 'deaths' : 'cases');
         });
 
         deltaToggle.addEventListener('click', () => {
@@ -174,6 +163,7 @@ export class App {
 
         this.day = this.model.dayCount - 1;
         this.deltaMode = 'daily';
+        this.row = 'cases';
 
         this.scope = scope;
         this.regionList = regionList;
@@ -181,7 +171,8 @@ export class App {
         this.card = card;
 
         this.modeSelectorButtons = modeSelectorButtons;
-        this.deltaSwitch = deltaSwitch;
+        this.deltaToggle = deltaSwitch;
+        this.rowToggle = rowToggle;
     }
 
     public getDay(): number {
@@ -213,12 +204,18 @@ export class App {
     }
 
     private setRow(row: RowName): void {
+        this.row = row;
+
         this.scope.setRow(row);
         this.regionList.setRow(row);
 
         this.sidebar.classList.remove('row-cases');
         this.sidebar.classList.remove('row-deaths');
         this.sidebar.classList.add(`row-${row}`);
+
+        this.rowToggle.classList.remove('cases');
+        this.rowToggle.classList.remove('deaths');
+        this.rowToggle.classList.add(row);
     }
 
     private setDeltaMode(mode: DeltaMode): void {
@@ -228,9 +225,9 @@ export class App {
         this.regionList.setDeltaMode(mode);
         this.card.setDeltaMode(mode);
 
-        this.deltaSwitch.classList.remove('daily');
-        this.deltaSwitch.classList.remove('total');
-        this.deltaSwitch.classList.add(mode);
+        this.deltaToggle.classList.remove('daily');
+        this.deltaToggle.classList.remove('total');
+        this.deltaToggle.classList.add(mode);
     }
 
     private focusOnRegion(region: Region): void {

@@ -1,4 +1,4 @@
-import { columnFaceCount, columnWidth } from '../constants';
+import { columnFaceCount, columnWidth, columnRotation } from '../constants';
 
 export class Column {
     public positionBuffer: WebGLBuffer;
@@ -22,15 +22,15 @@ export class Column {
         let normalIndex = 0;
         const angleStep = -(2 * Math.PI) / columnFaceCount;
         for (let i = 0; i < columnFaceCount; i++) {
-            const wallAngle = angleStep * (i + 0.5);
+            const wallAngle = columnRotation + angleStep * (i + 0.5);
             const wallAngleCos = Math.cos(wallAngle);
             const wallAngleSin = Math.sin(wallAngle);
 
-            const x1 = columnWidth * Math.cos(angleStep * i);
-            const y1 = columnWidth * Math.sin(angleStep * i);
+            const x1 = columnWidth * Math.cos(columnRotation + angleStep * i);
+            const y1 = columnWidth * Math.sin(columnRotation + angleStep * i);
 
-            const x2 = columnWidth * Math.cos(angleStep * (i + 1));
-            const y2 = columnWidth * Math.sin(angleStep * (i + 1));
+            const x2 = columnWidth * Math.cos(columnRotation + angleStep * (i + 1));
+            const y2 = columnWidth * Math.sin(columnRotation + angleStep * (i + 1));
 
             // Generating the top part:
             positions[positionIndex++] = 0;
