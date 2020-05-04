@@ -39,6 +39,7 @@ body {
     top: 50px;
     left: 0;
     user-select: none;
+    border-top: 1px solid #aaa;
 }
 
 .sidebar.mode-list,
@@ -340,7 +341,6 @@ body {
     width: 480px;
     height: 50px;
     display: flex;
-    border-bottom: 1px solid #aaa;
     cursor: pointer;
     user-select: none;
 }
