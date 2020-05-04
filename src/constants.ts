@@ -5,7 +5,7 @@ export const dateFormat = 'M/D/YY';
 
 export const mapStyle = 'mapbox://styles/mapbox/dark-v10';
 export const mapAttribution =
-    '<a href="https://alex.gl/">Alex Fedosov</a> | <a href="https://github.com/CSSEGISandData">JHU CSSE</a> | <a href="https://github.com/mediazona/data-corona-Russia">Mediazona</a>';
+    '<a href="https://alex.gl/">Alex Fedosov</a> | <a href="https://github.com/CSSEGISandData/COVID-19">JHU CSSE</a> | <a href="https://github.com/mediazona/data-corona-Russia">Mediazona</a>';
 
 export const initialPitch = 45;
 export const initialBearing = 0;
