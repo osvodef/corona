@@ -14,8 +14,9 @@
     "minify:css": "csso dist/style.css --output dist/style.css",
     "data:download": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/download",
     "data:validate": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/validate",
-    "data:merge": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/merge",
-    "data": "npm run data:download && npm run data:validate && npm run data:merge"
+    "data:merge:russia": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/mergeRussia",
+    "data:merge:usa": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/mergeUsa",
+    "data": "npm run data:download && npm run data:merge:russia && npm run data:merge:usa && npm run data:validate"
   },
   "keywords": [],
   "author": "",

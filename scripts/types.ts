@@ -3,13 +3,13 @@ export interface Record {
 }
 export type ParsedCsv = Record[];
 
-export type RussiaRecord = {
+export type RussianRecord = {
     name: string;
     confirmed: number[];
     dead: number[];
 };
 
-export type RussiaData = {
+export type RussianData = {
     startDate: string;
-    data: RussiaRecord[];
+    data: RussianRecord[];
 };

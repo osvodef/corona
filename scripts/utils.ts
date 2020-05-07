@@ -1,5 +1,7 @@
-export function getDayCount(headers: string[]): number {
-    return headers.filter((header) => isDate(header)).length;
+import * as parse from 'csv-parse/lib/sync';
+
+export function getDayCount(text: string): number {
+    return (parse(text)[0] as string[]).filter((header) => isDate(header)).length;
 }
 
 export function getDateList(dayOne: Date, dayCount: number): string[] {
