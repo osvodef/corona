@@ -14,7 +14,7 @@ export function clamp(value: number, min: number, max: number): number {
 
 export function formatNumber(x: number, deltaMode: DeltaMode): string {
     const deltaSign = deltaMode === 'daily' ? '+' : '';
-    return deltaSign + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return deltaSign + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
 export function isNarrowScreen(): boolean {
