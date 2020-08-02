@@ -44,7 +44,7 @@ function mergeRow(globalText: string, usaText: string): string {
     globalRecords = globalRecords.filter((entry) => entry['Country/Region'] !== 'US');
 
     const dayCount = getDayCount(globalText);
-    const dateList = getDateList(dayOne, dayCount);
+    const dateList = getDateList(dayOne, dayCount, 'M/D/YY');
 
     const recordsByState: { [state: string]: Record[] } = {};
     for (const record of usaRecords) {

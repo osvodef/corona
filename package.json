@@ -15,13 +15,15 @@
     "data:download": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/download",
     "data:validate": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/validate",
     "data:merge:usa": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/mergeUsa",
-    "data": "npm run data:download && npm run data:merge:usa && npm run data:validate"
+    "data:update:russia": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/updateRussia",
+    "data": "npm run data:download && npm run data:update:russia && npm run data:merge:russia && npm run data:merge:usa && npm run data:validate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/csv-parse": "^1.2.2",
+    "@types/date-and-time": "^0.13.0",
     "@types/mapbox-gl": "^1.8.0",
     "@types/node-fetch": "^2.5.5",
     "copy-webpack-plugin": "^5.1.1",
