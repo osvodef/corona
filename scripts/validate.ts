@@ -37,7 +37,7 @@ function validate(): void {
     }
 
     const dayCount = getDayCount(casesText);
-    const dateList = getDateList(dayOne, dayCount);
+    const dateList = getDateList(dayOne, dayCount, 'M/D/YY');
 
     for (const date of dateList) {
         if (!casesHeaders.includes(date)) {
@@ -99,6 +99,13 @@ function validate(): void {
         for (let i = 0; i < dateList.length; i++) {
             const date = dateList[i];
             const prevDate = dateList[i - 1];
+
+            if (casesRecord[date] === '') {
+                throw new Error(`Empty value in cases file, row #${i}, date ${date}`);
+            }
+            if (deathsRecord[date] === '') {
+                throw new Error(`Empty value in deaths file, row #${i}, date ${date}`);
+            }
 
             const cases = Number(casesRecord[date]);
             const deaths = Number(deathsRecord[date]);
