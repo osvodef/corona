@@ -5,7 +5,8 @@ import 'date-and-time/plugin/two-digit-year';
 dateLib.plugin('two-digit-year');
 
 export function getDayCount(text: string): number {
-    return (parse(text)[0] as string[]).filter((header) => isDate(header)).length;
+    return (parse(text)[0] as string[]).filter((header) => dateLib.isValid(header, 'M/D/YY'))
+        .length;
 }
 
 export function getDateList(dayOne: Date, dayCount: number, format: string): string[] {
@@ -18,10 +19,6 @@ export function getDateList(dayOne: Date, dayCount: number, format: string): str
     }
 
     return strings;
-}
-
-export function isDate(key: string): boolean {
-    return dateLib.isValid(key, 'M/D/YY') || dateLib.isValid(key, 'MM/DD/YY');
 }
 
 export function parseDate(string: string, format: string): Date {
