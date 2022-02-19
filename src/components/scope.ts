@@ -4,9 +4,9 @@ import fragmentShader from '../webgl/shaders/frag.glsl';
 import { Picker } from '../webgl/picker';
 import { Column } from '../webgl/column';
 import { Program } from '../webgl/program';
-import { animationSpeed } from '../constants';
 import { EventEmitter } from '../eventEmitter';
 import { MercatorCoordinate } from 'mapbox-gl';
+import { animationDuration } from '../constants';
 import { Model, RowName, Region, DeltaMode } from '../types';
 import {
     clamp,
@@ -302,7 +302,8 @@ export class Scope extends EventEmitter {
 
         const dayCount = this.model.dayCount;
         const elapsedTime = Date.now() - startTime;
-        const newDayIndex = startDayIndex + (elapsedTime * animationSpeed) / 1000;
+        const animationSpeed = dayCount / animationDuration;
+        const newDayIndex = startDayIndex + elapsedTime * animationSpeed;
 
         if (newDayIndex < dayCount - 1) {
             this.setDay(newDayIndex);

@@ -19,7 +19,7 @@ export const columnHeightTotal = 0.003;
 export const columnHeightDelta = 0.005;
 export const columnWidth = 0.0015;
 export const columnRotation = (30 / 180) * Math.PI;
-export const animationSpeed = 25;
+export const animationDuration = 5000;
 
 export const palette = [
     '#000004',
