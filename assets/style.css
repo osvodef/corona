@@ -87,6 +87,10 @@ body {
     outline: none;
 }
 
+.mapboxgl-ctrl-attrib-button {
+    display: none;
+}
+
 .scope {
     pointer-events: none;
 }
