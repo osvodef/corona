@@ -1,5 +1,5 @@
+import { parse } from 'csv/lib/sync';
 import * as dateLib from 'date-and-time';
-import * as parse from 'csv-parse/lib/sync';
 import 'date-and-time/plugin/two-digit-year';
 
 dateLib.plugin('two-digit-year');

@@ -1,8 +1,8 @@
 import { getDayCount, getDateList, equalArrays } from './utils';
 import { dataPath, usedColumns } from './constants';
-import * as stringify from 'csv-stringify/lib/sync';
-import * as parse from 'csv-parse/lib/sync';
 import { dayOne } from '../src/constants';
+import { stringify } from 'csv/lib/sync';
+import { parse } from 'csv/lib/sync';
 import { ParsedCsv } from './types';
 import * as path from 'path';
 import * as fs from 'fs';

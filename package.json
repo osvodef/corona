@@ -20,7 +20,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/csv-parse": "^1.2.2",
     "@types/date-and-time": "^0.13.0",
     "@types/mapbox-gl": "^1.8.0",
     "@types/node-fetch": "^2.5.5",
