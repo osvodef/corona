@@ -11,10 +11,7 @@
     "clean": "rm -rf dist",
     "minify": "npm run minify:html && npm run minify:css",
     "minify:html": "html-minifier -c html-minifier.json -o dist/index.html dist/index.html",
-    "minify:css": "csso dist/style.css --output dist/style.css",
-    "data:download": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/download",
-    "data:validate": "ts-node -O \"{\\\"module\\\": \\\"commonjs\\\"}\" scripts/validate",
-    "data": "npm run data:download && npm run data:validate"
+    "minify:css": "csso dist/style.css --output dist/style.css"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +27,6 @@
     "node-fetch": "^2.6.0",
     "prettier": "^1.19.1",
     "ts-loader": "^6.2.1",
-    "ts-node": "^8.6.2",
     "tslint": "^5.20.1",
     "tslint-config-airbnb": "^5.11.2",
     "typescript": "^3.7.3",
@@ -40,7 +36,7 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "dependencies": {
-    "csv": "^5.3.2",
+    "csv-parse": "^5.0.4",
     "date-and-time": "^0.13.1",
     "mapbox-gl": "^1.8.1"
   }

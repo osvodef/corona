@@ -2,7 +2,15 @@ import mapbox from 'mapbox-gl';
 import { isMobile, isNarrowScreen } from './utils';
 import { buildModel } from './model';
 import { App } from './components/app';
-import { mapAttribution, initialBounds, initialBearing, initialPitch, mapStyle } from './constants';
+import {
+    mapAttribution,
+    initialBounds,
+    initialBearing,
+    initialPitch,
+    mapStyle,
+    casesUrl,
+    deathsUrl,
+} from './constants';
 
 if (isSupported()) {
     init();
@@ -37,8 +45,8 @@ function init() {
     });
 
     Promise.all([
-        fetch('data/cases.csv').then((response) => response.text()),
-        fetch('data/deaths.csv').then((response) => response.text()),
+        fetch(casesUrl).then((response) => response.text()),
+        fetch(deathsUrl).then((response) => response.text()),
     ]).then((results) => {
         const model = buildModel(results[0], results[1]);
 

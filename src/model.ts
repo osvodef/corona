@@ -1,5 +1,5 @@
 import dateLib from 'date-and-time';
-import { parse } from 'csv/lib/sync';
+import { parse } from 'csv-parse/lib/sync';
 import 'date-and-time/plugin/two-digit-year';
 import { Model, Rows, Country } from './types';
 import { dateFormat, dayOne } from './constants';
