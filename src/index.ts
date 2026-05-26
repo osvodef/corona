@@ -25,7 +25,7 @@ function init() {
 
     const map = new mapbox.Map({
         accessToken:
-            'pk.eyJ1Ijoib3N2b2RlZiIsImEiOiJjazNwbjNlMWUwNGtkM2Vtb253MjM3cXhvIn0.A9Qebgu0gf2BlndYixeeOw',
+            'pk.eyJ1Ijoib3N2b2RlZiIsImEiOiJjbXBtN3N2MDAwNjQyMnNzOWx2ajlzNmVnIn0.sGdDQQpt3Ki6cUxGRiklCg',
         container: document.querySelector('.map') as HTMLDivElement,
         style: mapStyle,
         customAttribution: mapAttribution,
